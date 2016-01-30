@@ -56,8 +56,8 @@ void LauncherControl(int ball_count, int launcher_adjust = 0)
 	}
 	else
 	{
-		motor[Out1] = launcher_adjust * LAUNCHER_ADJUST_SPEED;
-		motor[Out2] = launcher_adjust * LAUNCHER_ADJUST_SPEED;
+		motor[Out1] = -launcher_adjust * LAUNCHER_ADJUST_SPEED;
+		motor[Out2] = -launcher_adjust * LAUNCHER_ADJUST_SPEED;
 	}
 }
 
@@ -74,7 +74,7 @@ Function governing the launcher angle. Takes 2 parameters:
 @absolute_angle : absolute angle we wish the launcher to be at.
 @angle_adjust : direction in which to change the angle.
 */
-void AngleControl(int absolute_angle, int angle_adjust = 0)
+void AngleControl(int absolute_angle, int angle_adjust = 0, int auto_angle = 0)
 {
 	if(absolute_angle > 0)
 	{
@@ -82,6 +82,16 @@ void AngleControl(int absolute_angle, int angle_adjust = 0)
 		{
 			motor[Angle] = 127 * sgn(absolute_angle - getAngle());
 		}
+	}
+	else if(auto_angle != 0)
+	{
+		switch(auto_angle)
+		{
+		case -1:
+			AngleControl(ANGLE_LONG_RANGE);
+		case 1:
+			AngleControl(ANGLE_SHORT_RANGE);
+	}
 	}
 	else
 	{
@@ -96,6 +106,10 @@ Function governing the intake system. Takes 1 parameter:
 void IntakeControl(int direction)
 {
 	motor[Intake] = 127 * direction;
+}
+
+void ElevatorControl(int direction)
+{
 	motor[Elevator] = 127 * direction;
 }
 

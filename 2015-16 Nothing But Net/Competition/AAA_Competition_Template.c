@@ -34,12 +34,17 @@
 #define X_Joy vexRT[Ch4]
 #define Y_Joy vexRT[Ch3]
 #define rot_Joy vexRT[Ch1]
-#define intakeBtn vexRT[Btn6U]
-#define outtakeBtn vexRT[Btn6D]
-#define launchBtn vexRT[Btn7U]
-#define launchAdj vexRT[Btn7D]
-#define angleUpBtn vexRT[Btn8D]
-#define angleDownBtn vexRT[Btn8D]
+#define intakeBtn vexRT[Btn6D]
+#define outtakeBtn vexRT[Btn5D]
+#define elevateBtn vexRT[Btn6U]
+#define delevatebtn vexRT[Btn5D]
+#define launchBtn vexRT[Btn8R]
+#define launchAdjBk vexRT[Btn8L]
+#define angleUpBtn vexRT[Btn7U]
+#define angleDownBtn vexRT[Btn7D]
+#define angleLongBtn vexRT[Btn8U]
+#define angleShortBtn vexRT[Btn8D]
+#define overrideBtn vexRT[Btn7L]
 
 int Ball_Count = 0;
 
@@ -111,6 +116,7 @@ task usercontrol()
 	startTask(Intaking);
 	startTask(Launch);
 	startTask(Aim);
+	startTask(EmergencyOverride);
 	while (true)
 	{
 		EndTimeSlice();
