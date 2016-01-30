@@ -20,6 +20,7 @@ task Intaking()
 	while(true)
 	{
 		IntakeControl(intakeBtn - outtakeBtn);
+		ElevatorControl(elevateBtn - delevatebtn);
 		EndTimeSlice();
 	}
 }
@@ -31,7 +32,7 @@ task Launch()
 {
 	while(true)
 	{
-		LauncherControl(launchBtn, launchAdj);
+		LauncherControl(launchBtn, launchAdjBk);
 		EndTimeSlice();
 	}
 }
@@ -43,7 +44,30 @@ task Aim()
 {
 	while(true)
 	{
-		AngleControl(0, angleUpBtn - angleDownBtn);
+		AngleControl(0, angleUpBtn - angleDownBtn, angleLongBtn - angleShortBtn);
+		EndTimeSlice();
+	}
+}
+
+task EmergencyOverride()
+{
+	while(true)
+	{
+		if(overrideBtn == 1)
+		{
+			stopAllTasks();
+			for(int i = 1; i <= 10; i++)
+			{
+				motor[i] = 0;
+			}
+			waitUntil(overrideBtn == 0);
+			Always();
+			startTask(Drive);
+			startTask(Intaking);
+			startTask(Launch);
+			startTask(Aim);
+			startTask(EmergencyOverride);
+		}
 		EndTimeSlice();
 	}
 }
