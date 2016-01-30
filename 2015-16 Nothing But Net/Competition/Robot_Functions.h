@@ -7,7 +7,7 @@ Function governing the movement of the base. Takes 3 parameters:
 @rot_comp : How much we want to rotate the robot CW/CCW
 @duration : How long to drive
 */
-void BaseControl(int X_comp, int Y_comp, int rot_comp, int duration = 10)
+void BaseControl(int X_comp, int Y_comp, int rot_comp, int duration = LOOP_DELAY)
 {
 	/*
 	Assuming the following control scheme:
@@ -26,6 +26,15 @@ void BaseControl(int X_comp, int Y_comp, int rot_comp, int duration = 10)
 	motor[LBBase] = 0;
 }
 
+void ABase(int X_comp, int Y_comp, int rot_comp, int duration)
+{
+	waitUntil(Auton_Drive_Array[3] == 0);
+	Auton_Drive_Array[0] = X_comp;
+	Auton_Drive_Array[1] = Y_comp;
+	Auton_Drive_Array[2] = rot_comp;
+	Auton_Drive_Array[3] = duration;
+}
+
 /*
 Function governing the launcher firing. Takes 1 parameter:
 @ball_ount : number of balls we wish to fire
@@ -42,6 +51,7 @@ void LauncherControl(int ball_count, int launcher_adjust = 0)
 			waitUntil(SensorValue[LauncherSet] == 1);
 			motor[Out1] = 0;
 			motor[Out2] = 0;
+			wait1Msec(DELAY_BETWEEN_BALLS);
 		}
 	}
 	else
@@ -89,6 +99,10 @@ void IntakeControl(int direction)
 	motor[Elevator] = 127 * direction;
 }
 
+void AIntake(int direction)
+{
+	Auton_Intake_Array[0] = direction;
+}
 /*
 Function in charge of determining whether a ball has entered or exited the intake system
 */
@@ -115,4 +129,9 @@ void TurnstileControl(bool reset = false)
 	SensorValue[Green2] = LED_array[1];
 	SensorValue[Green3] = LED_array[2];
 	SensorValue[Red] = LED_array[3];
+}
+
+int getUltras()
+{
+	return (SensorValue[BallFinder1] + SensorValue[BallFinder2]) / 2;
 }

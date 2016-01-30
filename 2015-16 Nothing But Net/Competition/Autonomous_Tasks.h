@@ -1,1 +1,53 @@
 //This header file contains the necessary tasks to run the major components of the robot simultaneously during Autonomous
+
+/*
+Task that governs all code related to the base
+*/
+task Auton_Drive()
+{
+	while(true)
+	{
+		if(Auton_Drive_Array[3] > 0)
+		{
+			Auton_Drive_Array[3] -= LOOP_DELAY;
+			BaseControl(Auton_Drive_Array[0], Auton_Drive_Array[1], Auton_Drive_Array[2]);
+		}
+		EndTimeSlice();
+	}
+}
+
+/*
+Task that governs all code related to the intake
+*/
+task Auton_Intaking()
+{
+	while(true)
+	{
+		IntakeControl(Auton_Intake_Array[0]);
+		EndTimeSlice();
+	}
+}
+
+/*
+Task that governs all code related to the launcher
+*/
+task Auton_Launch()
+{
+	while(true)
+	{
+		LauncherControl(Auton_Launch_Array[0], Auton_Launch_Array[1]);
+		EndTimeSlice();
+	}
+}
+
+/*
+Task that governs all code related to the angle changing
+*/
+task Auton_Aim()
+{
+	while(true)
+	{
+		AngleControl(Auton_Aim_Array[0], Auton_Aim_Array[1]);
+		EndTimeSlice();
+	}
+}
