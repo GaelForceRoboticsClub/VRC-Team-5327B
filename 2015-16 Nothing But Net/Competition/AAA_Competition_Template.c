@@ -11,7 +11,7 @@
 #pragma config(Sensor, dgtl6,  Red,            sensorLEDtoVCC)
 #pragma config(Sensor, dgtl7,  BallFinder1,    sensorSONAR_cm)
 #pragma config(Sensor, dgtl9,  BallFinder2,    sensorSONAR_cm)
-#pragma config(Motor,  port1,           Intake,        tmotorVex393_HBridge, openLoop)
+#pragma config(Motor,  port1,           Intake,        tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           Out1,          tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port3,           RFBase,        tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port4,           LFBase,        tmotorVex393_MC29, openLoop)
