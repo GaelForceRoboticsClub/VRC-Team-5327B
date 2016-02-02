@@ -60,7 +60,6 @@ task EmergencyOverride()
 			{
 				motor[i] = 0;
 			}
-			waitUntil(overrideBtn == 0);
 			Always();
 			startTask(Drive);
 			startTask(Intaking);
@@ -68,6 +67,7 @@ task EmergencyOverride()
 			startTask(Aim);
 			startTask(EmergencyOverride);
 		}
+		wait1Msec(1000);
 		EndTimeSlice();
 	}
 }
