@@ -942,7 +942,7 @@ end
 
 to showFrame
   let frameToBeDisp user-one-of "Please select a frame to display:" frames_array
-  
+  dispFrame
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
