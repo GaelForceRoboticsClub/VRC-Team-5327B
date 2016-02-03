@@ -937,12 +937,13 @@ to add-frame
   ]
 end
 
-to dispFrame
+to dispFrame [displayingFrame]
+  let dispFrameIndex [frameID] of displayingFrame
 end
 
 to showFrame
   let frameToBeDisp user-one-of "Please select a frame to display:" frames_array
-  dispFrame
+  print frameToBeDisp
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1455,6 +1456,23 @@ frames_array
 17
 1
 11
+
+BUTTON
+37
+33
+137
+66
+Show Frame
+showframe
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
