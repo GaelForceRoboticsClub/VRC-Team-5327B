@@ -25,11 +25,12 @@ breed [robotSketches robotSketch]
 breed [frames frame]
 
 frames-own [
+  currentrobot_array
   robotXs
   robotYs
   robotHs
   robotCaps
-  robotElls
+  robotEls
   pyramidsX
   pyramidsY
   bScore
@@ -40,6 +41,7 @@ frames-own [
 ]
 
 balls-own [
+  pyramidID
   targetX
   targetY
   alliance
@@ -926,23 +928,55 @@ to add-frame
   create-frames 1 [
     set size 0
     set frameID length frames_array
-    set robotXs [xcor] of robots
-    set robotYs [ycor] of robots
-    set robotHs [heading] of robots
-    set robotCaps [capacity] of robots
-    set robotElls [elevation] of robots
-    set pyramidsX [xcor] of balls with [shape = "nbnpyramid"]
     set frames_array lput frameID frames_array
-    print word "Frame made: " frameID
+    let temprobotarray []
+    let temprobotXarray []
+    let temprobotYarray []
+    let temprobotHarray []
+    let temprobotCAParray []
+    let temprobotELarray []
+    let counter 0
+    while [counter < length robot_array]
+    [
+      ask robots with [robotID = item counter robot_array] [
+         set temprobotarray lput robotID temprobotarray
+         set temprobotXarray lput xcor temprobotXarray
+         set temprobotYarray lput ycor temprobotYarray
+         set temprobotHarray lput heading temprobotHarray
+         set temprobotCAParray lput capacity temprobotCAParray
+         set temprobotELarray lput elevation temprobotELarray
+      ]
+      set counter counter + 1
+    ]
+    set currentrobot_array temprobotarray
+    set robotXs temprobotXarray
+    set robotYs temprobotYarray
+    set robotHs temprobotHarray
+    set robotCAPs temprobotCAParray
+    set robotELs temprobotElarray
+    print currentrobot_array
+    print robotXs
+    print robotYs
+    print robotHs
+    print robotCAPs
+    print robotEls
   ]
 end
 
-to dispFrame
+to dispFrame [frameBeingDisp]
+  let actualFrame one-of frames with [frameID = frameBeingDisp]
+  ask robots [
+    let indexInArray position robotID robot_array
+    setxy item indexInArray [robotXs] of actualFrame item indexInArray [robotYs] of actualFrame
+    set heading item indexinarray [robotHs] of actualFrame
+    set capacity item indexinarray [robotcaps] of actualFrame
+    set elevation item indexinarray [robotEls] of actualFrame    
+  ]
 end
 
 to showFrame
   let frameToBeDisp user-one-of "Please select a frame to display:" frames_array
-  dispFrame
+  dispFrame frametobedisp
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1455,6 +1489,23 @@ frames_array
 17
 1
 11
+
+BUTTON
+63
+42
+172
+75
+Display Frame
+showframe
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
