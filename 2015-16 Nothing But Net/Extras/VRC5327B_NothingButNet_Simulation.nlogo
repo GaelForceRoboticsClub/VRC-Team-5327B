@@ -11,7 +11,7 @@ globals [
   robot_array
   fireCheck
   frames_array
-  currentFrame
+  currFrame
   ]
 breed [tiles tile]
 breed [tape tapesing]
