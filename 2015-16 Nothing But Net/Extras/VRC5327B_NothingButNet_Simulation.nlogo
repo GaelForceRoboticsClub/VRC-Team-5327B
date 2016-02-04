@@ -11,7 +11,9 @@ globals [
   robot_array
   fireCheck
   frames_array
-  currentFrame
+  currFrame
+  lastTimeFramed
+  pyramids_array
   ]
 breed [tiles tile]
 breed [tape tapesing]
@@ -25,13 +27,13 @@ breed [robotSketches robotSketch]
 breed [frames frame]
 
 frames-own [
+  currentrobot_array
   robotXs
   robotYs
   robotHs
   robotCaps
-  robotElls
-  pyramidsX
-  pyramidsY
+  robotEls
+  pyramids
   bScore
   rScore
   bLoads
@@ -40,9 +42,11 @@ frames-own [
 ]
 
 balls-own [
+  pyramidID
   targetX
   targetY
   alliance
+  status
 ]
 
 robotSketches-own [
@@ -87,13 +91,15 @@ to startup
 end
 
 to reset-field
-  ask balls [
-    die
-  ]
+  clear-drawing
   ask robots [
     set capacity []
     set elevation "None"
   ]
+  set lasttimeframed -5
+  set currFrame 0
+  set frames_array []
+  set pyramids_array []
   set timing? false
   set running? false
   set BlueLoads 32
@@ -104,61 +110,17 @@ to reset-field
   set BlueScore 0
   set RedScore 0
   clear-output
-  create-balls 1 [
-    set shape "nbnpyramid"
+  ask balls with [shape = "nbnpyramid"]
+  [
     set size 1.5
-    setxy 3.5 1.5
-  ]
-  create-balls 1 [
-    set shape "nbnpyramid"
-    set size 1.5
-    setxy 1.5 1.5
+    set status "Standing"
+    if not ((abs(xcor - 2.5) > 2.5) or abs(ycor - 2.5) > 2.5)
+    [
+      set heading random 360
     ]
-  create-balls 1 [
-    set shape "nbnpyramid"
-    set size 1.5
-    setxy 3.5 3.5
-  ]
-  create-balls 1 [
-    set shape "nbnpyramid"
-    set size 1.5
-    setxy 1.5 3.5
-  ]
-  create-balls 1 [
-    set shape "nbnpyramid"
-    set size 1.5
-    setxy 2.5 0.5
-  ]
-  create-balls 1 [
-    set shape "nbnpyramid"
-    set size 1.5
-    setxy 2.5 4.5
-  ]
-  create-balls 1 [
-    set shape "nbnpyramid"
-    set size 1.5
-    setxy 2.5 5.65
-    set heading 180
-  ]
-  create-balls 1 [
-    set shape "nbnpyramid"
-    set size 1.5
-    setxy 2.5 5.35
-    set heading 0
-  ]
-  create-balls 1 [
-    set shape "nbnpyramid"
-    set size 1.5
-    setxy 5.35 2.5
-    set heading 90
-  ]
-  create-balls 1 [
-    set shape "nbnpyramid"
-    set size 1.5
-    setxy 5.65 2.5
-    set heading 270
   ]
   resetbots
+  reset-frames
 end
 
 to hardreset
@@ -167,6 +129,7 @@ to hardreset
   reset-field
   set robotsketch_array []
   set robot_array []
+  set frames_array []
   ask patches [
     set pcolor grey
   ]
@@ -281,6 +244,70 @@ to hardreset
       fd 0.01
       hatch 1
     ]
+  ]
+  create-balls 1 [
+    set shape "nbnpyramid"
+    set size 1.5
+    setxy 3.5 1.5
+    set pyramidID "Pyr0"
+  ]
+  create-balls 1 [
+    set shape "nbnpyramid"
+    set size 1.5
+    setxy 1.5 1.5
+    set pyramidID "Pyr1"
+    ]
+  create-balls 1 [
+    set shape "nbnpyramid"
+    set size 1.5
+    setxy 3.5 3.5
+    set pyramidID "Pyr2"
+  ]
+  create-balls 1 [
+    set shape "nbnpyramid"
+    set size 1.5
+    setxy 1.5 3.5
+    set pyramidID "Pyr3"
+  ]
+  create-balls 1 [
+    set shape "nbnpyramid"
+    set size 1.5
+    setxy 2.5 0.5
+    set pyramidID "Pyr4"
+  ]
+  create-balls 1 [
+    set shape "nbnpyramid"
+    set size 1.5
+    setxy 2.5 4.5
+    set pyramidID "Pyr5"
+  ]
+  create-balls 1 [
+    set shape "nbnpyramid"
+    set size 1.5
+    setxy 2.5 5.65
+    set heading 180
+    set pyramidID "Pyr6"
+  ]
+  create-balls 1 [
+    set shape "nbnpyramid"
+    set size 1.5
+    setxy 2.5 5.35
+    set heading 0
+    set pyramidID "Pyr7"
+  ]
+  create-balls 1 [
+    set shape "nbnpyramid"
+    set size 1.5
+    setxy 5.35 2.5
+    set heading 90
+    set pyramidID "Pyr8"
+  ]
+  create-balls 1 [
+    set shape "nbnpyramid"
+    set size 1.5
+    setxy 5.65 2.5
+    set heading 270
+    set pyramidID "Pyr9"
   ]
 end
 
@@ -422,13 +449,14 @@ to go
     ask balls with [shape = "nbnpyramid"][
       let closestRoller min-one-of rollers [distancexy [xcor] of myself [ycor] of myself]
       let checkID [rollerID] of closestRoller
-      if(distance closestRoller < 0.25 and length first([capacity] of robots with [robotID = checkID]) = 0)
+      if(distance closestRoller < 0.25 and length first([capacity] of robots with [robotID = checkID]) = 0 and status = "Standing")
       [
         ask robots with [robotID = checkID]
         [
           set capacity [green green green orange]
         ]
-        die
+        set size 0
+        set status "Intaken"
       ]
     ]
     ask balls with [shape = "nbnball"] [
@@ -475,10 +503,73 @@ to go
         die
       ]
     ]
-    commentary
+    ifelse not Practice?
+    [
+      commentary
+    ]
+    [
+      if cstep < 4
+      [
+        output-print "Practice! No timer and unlimited frames creation,"
+        output-print "but rules are still enforced"
+      ]
+      set time 90
+      set cstep 4
+    ]
     if timing?
     [
       set time timer
+      if time >= lasttimeframed + 2
+      [
+        set lasttimeframed lasttimeframed + 2
+        create-frames 1 [
+          set size 0
+          set frameID word "Frame" lasttimeframed
+          set frames_array lput frameID frames_array
+          let temprobotarray []
+          let temprobotXarray []
+          let temprobotYarray []
+          let temprobotHarray []
+          let temprobotCAParray []
+          let temprobotELarray []
+          let temppyramidsarray []
+          let counter 0
+          while [counter < length robot_array]
+          [
+            ask robots with [robotID = item counter robot_array] [
+              set temprobotarray lput robotID temprobotarray
+              set temprobotXarray lput xcor temprobotXarray
+              set temprobotYarray lput ycor temprobotYarray
+              set temprobotHarray lput heading temprobotHarray
+              set temprobotCAParray lput capacity temprobotCAParray
+              set temprobotELarray lput elevation temprobotELarray
+            ]
+            set counter counter + 1
+          ]
+          set counter 0
+          while [counter < 10]
+          [
+            ask balls with [pyramidID = word "Pyr" counter] [
+              set temppyramidsarray lput status temppyramidsarray
+            ]
+            set counter counter + 1
+          ]
+          set currentrobot_array temprobotarray
+          set robotXs temprobotXarray
+          set robotYs temprobotYarray
+          set robotHs temprobotHarray
+          set robotCAPs temprobotCAParray
+          set robotELs temprobotElarray
+          set pyramids temppyramidsarray
+          set bscore blueScore
+          set rscore redScore
+          set bloads Blueloads
+          set rloads redloads
+        ]
+      ]
+    ]
+    ask robots [
+      pu
     ]
     wait 0.01
   ]
@@ -837,8 +928,7 @@ to addrobottofield
   create-robots 1 [
     set shape "square"
     set heading 0
-    set color grey - 3
-    set size 2
+        set size 2
     let desiredrobotID user-input "Enter a name for this robot: (MUST be unique)"
     ask robots with [robotID = desiredrobotID] [die]
     set robot_array remove desiredrobotID robot_array
@@ -871,6 +961,8 @@ to addrobottofield
         ]
       ]
     ]
+    set color (position robotID robot_array + 1) * 20 + 5
+
   ]
   create-rollers 1 [
     set rollerID last robot_array
@@ -925,25 +1017,131 @@ end
 to add-frame
   create-frames 1 [
     set size 0
-    set frameID length frames_array
-    set robotXs [xcor] of robots
-    set robotYs [ycor] of robots
-    set robotHs [heading] of robots
-    set robotCaps [capacity] of robots
-    set robotElls [elevation] of robots
-    set pyramidsX [xcor] of balls with [shape = "nbnpyramid"]
+    set frameID user-input "Please name this frame: "
+    let framesRand length frames_array
+    let framesCheck false
+    if frameID = ""
+    [
+      set framesCheck true
+    ]
+    while [not(position frameID frames_array = false and frameID != "")]
+    [
+      ifelse framesCHeck
+      [
+        set frameID word "Frame" framesRand
+        set framesRand framesRand + 1
+      ]
+      [
+        set frameID user-input "Invalid frame name. Please name this frame:"
+      ]
+    ]
     set frames_array lput frameID frames_array
-    print word "Frame made: " frameID
+    let temprobotarray []
+    let temprobotXarray []
+    let temprobotYarray []
+    let temprobotHarray []
+    let temprobotCAParray []
+    let temprobotELarray []
+    let temppyramidsarray []
+    let counter 0
+    while [counter < length robot_array]
+    [
+      ask robots with [robotID = item counter robot_array] [
+        set temprobotarray lput robotID temprobotarray
+        set temprobotXarray lput xcor temprobotXarray
+        set temprobotYarray lput ycor temprobotYarray
+        set temprobotHarray lput heading temprobotHarray
+        set temprobotCAParray lput capacity temprobotCAParray
+        set temprobotELarray lput elevation temprobotELarray
+      ]
+      set counter counter + 1
+    ]
+    set counter 0
+    while [counter < 10]
+    [
+      ask balls with [pyramidID = word "Pyr" counter] [
+        set temppyramidsarray lput status temppyramidsarray
+      ]
+      set counter counter + 1
+    ]
+    set currentrobot_array temprobotarray
+    set robotXs temprobotXarray
+    set robotYs temprobotYarray
+    set robotHs temprobotHarray
+    set robotCAPs temprobotCAParray
+    set robotELs temprobotElarray
+    set pyramids temppyramidsarray
+    set bscore blueScore
+    set rscore redScore
+    set bloads Blueloads
+    set rloads redloads
   ]
 end
 
-to dispFrame [displayingFrame]
-  let dispFrameIndex [frameID] of displayingFrame
+to dispFrame [frameBeingDisp]
+  clear-drawing
+  let actualFrame one-of frames with [frameID = frameBeingDisp]
+  ask robots [
+    pen-down
+    set pen-size 2
+    let indexInArray position robotID robot_array
+    setxy item indexInArray [robotXs] of actualFrame item indexInArray [robotYs] of actualFrame
+    set heading item indexinarray [robotHs] of actualFrame
+    set capacity item indexinarray [robotcaps] of actualFrame
+    set elevation item indexinarray [robotEls] of actualFrame
+    pen-up    
+  ]
+  let counter 0
+  while [counter < 10]
+    [
+      ask balls with [pyramidID = word "Pyr" counter] [
+        ifelse (item counter ([pyramids] of actualFrame)) = "Standing"
+        [
+          set status "Standing"
+          set size 1.5
+        ]
+        [
+          set status "Intaken"
+          set size 0
+        ]
+      ]
+      set counter counter + 1
+    ]
 end
 
 to showFrame
   let frameToBeDisp user-one-of "Please select a frame to display:" frames_array
-  print frameToBeDisp
+  dispFrame frametobedisp
+end
+
+to deleteFrame
+  let frameToBeDel user-one-of "Please select a frame to delete:" frames_array
+  set frames_array remove frameToBeDel frames_array
+  ask frames with [frameID = frameToBeDel]
+  [
+    die
+  ]
+end
+
+to nextframe
+  set currframe min list (currFrame + 1) (length frames_array - 1)
+  dispFrame item currFrame frames_array
+end
+
+to previousframe
+  set currframe max list (currFrame - 1) (0)
+  dispFrame item currFrame frames_array
+end
+
+to exportFilm
+  file-open user-new-file
+  file-print frames_array
+  ask frames [
+    file-print frameID
+    file-print currentrobot_array
+   
+  ]
+   file-close
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1413,10 +1611,10 @@ bluescore
 11
 
 BUTTON
-31
-113
-139
-146
+1181
+330
+1289
+363
 Reset Frames
 reset-frames
 NIL
@@ -1430,10 +1628,10 @@ NIL
 1
 
 BUTTON
-18
-182
-137
-215
+1062
+330
+1181
+363
 Add New Frame
 add-frame
 NIL
@@ -1447,10 +1645,10 @@ NIL
 1
 
 MONITOR
-106
-312
-163
-357
+1063
+404
+1289
+449
 Frames
 frames_array
 17
@@ -1458,12 +1656,102 @@ frames_array
 11
 
 BUTTON
-37
-33
-137
-66
-Show Frame
+1062
+363
+1181
+396
+Display Frame
 showframe
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1181
+363
+1289
+396
+Delete Frame
+deleteFrame
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1183
+477
+1286
+510
+Next Frame
+nextframe
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1066
+477
+1183
+510
+Previous Frame
+previousFrame
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+MONITOR
+1293
+404
+1387
+449
+Current Frame
+currFrame
+17
+1
+11
+
+SWITCH
+163
+338
+268
+371
+Practice?
+Practice?
+0
+1
+-1000
+
+BUTTON
+1066
+519
+1186
+552
+Export Match Film
+exportFilm
 NIL
 1
 T
