@@ -12,12 +12,12 @@
 #pragma config(Sensor, dgtl7,  BallFinder1,    sensorSONAR_cm)
 #pragma config(Sensor, dgtl9,  BallFinder2,    sensorSONAR_cm)
 #pragma config(Motor,  port1,           Intake,        tmotorVex393_HBridge, openLoop, reversed)
-#pragma config(Motor,  port2,           Out1,          tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port3,           RFBase,        tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port2,           Out1,          tmotorVex393_MC29, openLoop, reversed)
+#pragma config(Motor,  port3,           RFBase,        tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port4,           LFBase,        tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port5,           Angle,         tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port5,           Angle,         tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port6,           Out2,          tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port7,           RBBase,        tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port7,           RBBase,        tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port8,           LBBase,        tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port9,           Out3,          tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port10,          Elevator,      tmotorVex393_HBridge, openLoop)
@@ -37,7 +37,7 @@
 #define intakeBtn vexRT[Btn6D]
 #define outtakeBtn vexRT[Btn5D]
 #define elevateBtn vexRT[Btn6U]
-#define delevatebtn vexRT[Btn5D]
+#define delevatebtn vexRT[Btn5U]
 #define launchBtn vexRT[Btn8R]
 #define launchAdjBk vexRT[Btn8L]
 #define angleUpBtn vexRT[Btn7U]

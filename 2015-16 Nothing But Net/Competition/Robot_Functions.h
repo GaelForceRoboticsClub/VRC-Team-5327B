@@ -91,7 +91,7 @@ void AngleControl(int absolute_angle, int angle_adjust = 0, int auto_angle = 0)
 			AngleControl(ANGLE_LONG_RANGE);
 		case 1:
 			AngleControl(ANGLE_SHORT_RANGE);
-	}
+		}
 	}
 	else
 	{
