@@ -7,7 +7,7 @@ task Drive()
 {
 	while(true)
 	{
-		BaseControl(X_Joy, Y_Joy, rot_Joy);
+		BaseControl(X_Joy, Y_Joy, rot_Joy, toggleSlowBtn);
 		EndTimeSlice();
 	}
 }
@@ -19,8 +19,19 @@ task Intaking()
 {
 	while(true)
 	{
-		IntakeControl(intakeBtn - outtakeBtn);
-		ElevatorControl(elevateBtn - delevatebtn);
+		if(intakeModifierBtn == 1)
+		{
+			IntakeControl(inBtn - outBtn);
+		}
+		else if(outtakeModifierBtn == 1)
+		{
+			ElevatorControl(inBtn - outBtn);
+		}
+		else
+		{
+			IntakeControl(inBtn - outBtn);
+			ElevatorControl(inBtn - outBtn);
+		}
 		EndTimeSlice();
 	}
 }
@@ -32,7 +43,7 @@ task Launch()
 {
 	while(true)
 	{
-		LauncherControl(launchBtn, launchAdjBk);
+		LauncherControl(0, launchFast, launchSlow);
 		EndTimeSlice();
 	}
 }
@@ -44,6 +55,10 @@ task Aim()
 {
 	while(true)
 	{
+		clearLCDLine(0);
+		setLCDPosition(0, 0);
+		displayNextLCDString("AngleValue: ");
+		displayNextLCDNumber(getAngle());
 		AngleControl(0, angleUpBtn - angleDownBtn, angleLongBtn - angleShortBtn);
 		EndTimeSlice();
 	}
@@ -55,17 +70,28 @@ task EmergencyOverride()
 	{
 		if(overrideBtn == 1)
 		{
-			stopAllTasks();
+			stopTask(Drive);
+			stopTask(Intaking);
+			stopTask(Launch);
+			stopTask(Aim);
+			emergenStop = true;
+			stopAlways();
+			AngleControl(0);
+			LauncherControl(0);
+			IntakeControl(0);
+			ElevatorControl(0);
+			BaseControl(0, 0, 0);
 			for(int i = 1; i <= 10; i++)
 			{
 				motor[i] = 0;
 			}
+			wait1Msec(2000);
+			emergenStop = false;
 			Always();
 			startTask(Drive);
 			startTask(Intaking);
 			startTask(Launch);
 			startTask(Aim);
-			startTask(EmergencyOverride);
 		}
 		wait1Msec(1000);
 		EndTimeSlice();
