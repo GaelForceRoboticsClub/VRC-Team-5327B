@@ -7,18 +7,18 @@ Function governing the movement of the base. Takes 3 parameters:
 @rot_comp : How much we want to rotate the robot CW/CCW
 @duration : How long to drive
 */
-void BaseControl(int X_comp, int Y_comp, int rot_comp, int duration = LOOP_DELAY)
+void BaseControl(int X_comp, int Y_comp, int rot_comp, int slow = 0, int duration = LOOP_DELAY)
 {
 	/*
 	Assuming the following control scheme:
 	X-Drive Base, where all motors drive forward when set to 127
 	X and Y are as they are defined in the Cartesian coordinate plane
-	Rotation is positive for CW, negative for CCW
+	Rotation is posi0tive for CW, negative for CCW
 	*/
-	motor[RFBase] = Y_comp - X_comp;// + rot_comp;
-	motor[LFBase] = Y_comp + X_comp;// + rot_comp;
-	motor[RBBase] = Y_comp + X_comp;// + rot_comp;
-	motor[LBBase] = Y_comp - X_comp;// + rot_comp;
+	motor[RFBase] = Y_comp - X_comp - (rot_comp * (1 - 0.75 * slow));
+	motor[LFBase] = Y_comp + X_comp + (rot_comp * (1 - 0.75 * slow));
+	motor[RBBase] = Y_comp + X_comp - (rot_comp * (1 - 0.75 * slow));
+	motor[LBBase] = Y_comp - X_comp + (rot_comp * (1 - 0.75 * slow));
 	wait1Msec(duration);
 	motor[RFBase] = 0;
 	motor[LFBase] = 0;
@@ -37,10 +37,10 @@ void ABase(int X_comp, int Y_comp, int rot_comp, int duration)
 
 /*
 Function governing the launcher firing. Takes 1 parameter:
-@ball_ount : number of balls we wish to fire
+@ball_count : number of balls we wish to fire
 @launcher_adjust : adjust launcher manually
 */
-void LauncherControl(int ball_count, int launcher_adjust = 0)
+void LauncherControl(int ball_count, int launcher_fast = 0, int launcher_slow = 0)
 {
 	if(ball_count > 0)
 	{
@@ -48,16 +48,25 @@ void LauncherControl(int ball_count, int launcher_adjust = 0)
 		{
 			motor[Out1] = 127;
 			motor[Out2] = 127;
+			motor[Out3] = 127;
 			waitUntil(SensorValue[LauncherSet] == 1);
 			motor[Out1] = 0;
 			motor[Out2] = 0;
+			motor[Out3] = 0;
 			wait1Msec(DELAY_BETWEEN_BALLS);
 		}
 	}
+	else if(launcher_slow == 0)
+	{
+		motor[Out1] = launcher_fast * LAUNCHER_ADJUST_SPEED;
+		motor[Out2] = launcher_fast * LAUNCHER_ADJUST_SPEED;
+		motor[Out3] = launcher_fast * LAUNCHER_ADJUST_SPEED;
+	}
 	else
 	{
-		motor[Out1] = -launcher_adjust * LAUNCHER_ADJUST_SPEED;
-		motor[Out2] = -launcher_adjust * LAUNCHER_ADJUST_SPEED;
+		motor[Out1] = launcher_slow * LAUNCHER_SLOW_SPEED;
+		motor[Out2] = launcher_slow * LAUNCHER_SLOW_SPEED;
+		motor[Out3] = launcher_slow * LAUNCHER_SLOW_SPEED;
 	}
 }
 
@@ -66,7 +75,12 @@ Function that returns a single value for the angle of the launcher based on the 
 */
 int getAngle()
 {
-	return (SensorValue[AnglePot1] + SensorValue[AnglePot2] - POT_SCALE) / 2;
+	return SensorValue[AnglePot];
+}
+
+bool stopAngle()
+{
+	return emergenStop || closeEnough(getAngle(), ANGLE_MAX_VAL, ANGLE_TOLERANCE) || closeEnough(getAngle(), ANGLE_MIN_VAL, ANGLE_TOLERANCE);
 }
 
 /*
@@ -78,10 +92,26 @@ void AngleControl(int absolute_angle, int angle_adjust = 0, int auto_angle = 0)
 {
 	if(absolute_angle > 0)
 	{
-		repeatUntil(closeEnough(getAngle(), absolute_angle, ANGLE_TOLERANCE))
+		if(getAngle() > absolute_angle) //If we are currently BELOW the desired angle
 		{
-			motor[Angle] = 127 * sgn(absolute_angle - getAngle());
+			repeatUntil(getAngle() < absolute_angle || stopAngle())
+			{
+				motor[Angle] = 50;
+				clearLCDLine(0);
+				displayLCDNumber(0, 0, getAngle(), 6);
+				displayNextLCDString(" Aim: ");
+				displayNextLCDNumber(absolute_angle);
+				wait1Msec(100);
+			}
+			motor[Angle] = 0;
 		}
+		else //If we are currently ABOVE the desired angle
+		{
+		}
+		/*repeatUntil(closeEnough(getAngle(), absolute_angle, ANGLE_TOLERANCE) || stopAngle())
+		{
+			motor[Angle] = 127 * -sgn(absolute_angle - getAngle());
+		}*/
 	}
 	else if(auto_angle != 0)
 	{
@@ -90,12 +120,24 @@ void AngleControl(int absolute_angle, int angle_adjust = 0, int auto_angle = 0)
 		case -1:
 			AngleControl(ANGLE_LONG_RANGE);
 		case 1:
+			displayLCDCenteredString(0, "Short Range");
 			AngleControl(ANGLE_SHORT_RANGE);
 		}
 	}
 	else
 	{
-		motor[Angle] = ANGLE_ADJUST_SPEED * angle_adjust;
+		if(angle_adjust == 1 && getAngle() > ANGLE_MIN_VAL)
+		{
+			motor[Angle] = ANGLE_ADJUST_SPEED;
+		}
+		else if(angle_adjust == -1 && getAngle() < ANGLE_MAX_VAL)
+		{
+			motor[Angle] = -ANGLE_ADJUST_SPEED;
+		}
+		else
+		{
+			motor[Angle] = 0;
+		}
 	}
 }
 

@@ -7,16 +7,18 @@ const int BALL_WIDTH = 10; //How big each ball is (roughly), used to determine i
 //Base Constants:
 
 //Launcher Constants:
-const int LAUNCHER_ADJUST_SPEED = 50; //Changes how fast the launcher is adjusted when manually controlled by driver
+const int LAUNCHER_ADJUST_SPEED = 127; //Changes how fast the launcher is adjusted when manually controlled by driver
 const int DELAY_BETWEEN_BALLS = 50; //How long to wait between firing one ball and pulling back for the next, useful to prevent the motor from skipping
+const int LAUNCHER_SLOW_SPEED = 80;
 
 //Intake Constants
 const int BALL_INTOOK = 3000; //Sensor reading of potentiometer turnstile that represents a new ball being intaken
 const int BALL_OUTTOOK = 1000; //Sensor reading of potentiometer turnstile that represents a new ball being outtaken
 
 //Angle Constants
-const int ANGLE_TOLERANCE = 5; //How close the sensor values for angle need to be to the desired angle to shoot
-const int POT_SCALE = -10; //The difference between AnglePot1 and AnglePot2 when they're at the (theoretically) same angle
+const int ANGLE_TOLERANCE = 25; //How close the sensor values for angle need to be to the desired angle to shoot
 const int ANGLE_ADJUST_SPEED = 50; //How fast the angle is adjusted when manually controlled by driver
 const int ANGLE_LONG_RANGE = 300; //The potentiometer setting for shooting long range (starting tiles)
-const int ANGLE_SHORT_RANGE = 150; //The potentiometer setting for shooting close up (midfield ish)
+const int ANGLE_SHORT_RANGE = 890; //The potentiometer setting for shooting close up (midfield ish)
+const int ANGLE_MAX_VAL = 1140;
+const int ANGLE_MIN_VAL = 720;

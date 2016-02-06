@@ -17,3 +17,8 @@ void Always()
 {
 	startTask(ballCounter);
 }
+
+void stopAlways()
+{
+	stopTask(ballCounter);
+}

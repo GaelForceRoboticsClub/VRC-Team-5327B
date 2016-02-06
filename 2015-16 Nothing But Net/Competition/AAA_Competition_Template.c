@@ -1,7 +1,8 @@
 #pragma config(Sensor, in1,    BallSensor,     sensorReflection)
-#pragma config(Sensor, in2,    AnglePot1,      sensorPotentiometer)
-#pragma config(Sensor, in3,    AnglePot2,      sensorPotentiometer)
-#pragma config(Sensor, in4,    Turnstile,      sensorNone)
+#pragma config(Sensor, in2,    AnglePot,      sensorPotentiometer)
+#pragma config(Sensor, in4,    Turnstile,      sensorPotentiometer)
+#pragma config(Sensor, in5,    RLine,          sensorLineFollower)
+#pragma config(Sensor, in6,    LLine,          sensorLineFollower)
 #pragma config(Sensor, in8,    Gyro,           sensorGyro)
 #pragma config(Sensor, dgtl1,  LauncherSet,    sensorTouch)
 #pragma config(Sensor, dgtl2,  AngleSet,       sensorTouch)
@@ -16,7 +17,7 @@
 #pragma config(Motor,  port3,           RFBase,        tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port4,           LFBase,        tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port5,           Angle,         tmotorVex393_MC29, openLoop, reversed)
-#pragma config(Motor,  port6,           Out2,          tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port6,           Out2,          tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port7,           RBBase,        tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port8,           LBBase,        tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port9,           Out3,          tmotorVex393_MC29, openLoop)
@@ -34,19 +35,21 @@
 #define X_Joy vexRT[Ch4]
 #define Y_Joy vexRT[Ch3]
 #define rot_Joy vexRT[Ch1]
-#define intakeBtn vexRT[Btn6D]
-#define outtakeBtn vexRT[Btn5D]
-#define elevateBtn vexRT[Btn6U]
-#define delevatebtn vexRT[Btn5U]
-#define launchBtn vexRT[Btn8R]
-#define launchAdjBk vexRT[Btn8L]
+#define inBtn vexRT[Btn6U]
+#define outBtn vexRT[Btn6D]
+#define intakeModifierBtn vexRT[Btn5D]
+#define outtakeModifierBtn vexRT[Btn5U]
+#define launchFast vexRT[Btn8R]
+#define launchSlow vexRT[Btn8L]
 #define angleUpBtn vexRT[Btn7U]
 #define angleDownBtn vexRT[Btn7D]
-#define angleLongBtn vexRT[Btn8U]
-#define angleShortBtn vexRT[Btn8D]
-#define overrideBtn vexRT[Btn7L]
+#define angleLongBtn vexRT[Btn8D]
+#define angleShortBtn vexRT[Btn8U]
+#define overrideBtn vexRT[Btn7R]
+#define toggleSlowBtn vexRT[Btn7L]
 
 int Ball_Count = 0;
+int emergenStop = false;
 
 int Auton_Drive_Array[4]; //Arrays that are used during autonomous in a manner similar to the motor array, contains: X, Y, Rot, and Duration
 int Auton_Aim_Array[2]; //Contains: Absolute and Adjust
