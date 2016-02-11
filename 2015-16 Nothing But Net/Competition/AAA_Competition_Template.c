@@ -63,7 +63,8 @@ int Auton_Intake_Array[1]; //Contains: Direction
 #include "Autonomous_Tasks.h"
 #include "DriverControl_Tasks.h"
 
-#define pew LauncherControl(1)
+#define pew LauncherControl(0, 1)
+
 //Predefined construct
 void pre_auton()
 {
@@ -77,39 +78,20 @@ void pre_auton()
 //Predefined construct
 task autonomous
 {
-	startTask(Auton_Drive); //Start necessary tasks
-	startTask(Auton_Intaking);
-	startTask(Auton_Launch);
-	startTask(Auton_Aim);
-	Always(); //Start tasks that should be always run
-	pew; //Shoot 4 times, launching the auton preloads
-	pew;
-	pew;
-	pew;
-	ABase(0, 100, 0, 250); //Move the robot slightly forward, so that there is enough clearance for the robot to turn
-	ABase(0, 0, 100, 500); //Rotate the robot 135 degrees clockwise, so that we are now facing the near wall
-	ABase(0, 100, 0, 250); //Ram into the wall for angle alignment
-	ABase(0, -100, 0, 250); //Move back slightly so that we can strafe over without knocking over the pile of balls
+	motor[Intake] = 127;
+	motor[Elevator] = -127;
+	motor[LFBase] = 127;
+	motor[LBBase] = 127;
+	motor[RFBase] = 127;
+	motor[RBBase] = 127;
+	wait1Msec(2500);
+	motor[Intake] = 0;
+	motor[Elevator] = 0;
+	motor[LFBase] = 0;
+	motor[LBBase] = 0;
+	motor[RFBase] = 0;
+	motor[RBBase] = 0;
 
-	int defaultUltraSensing = getUltras(); //Define an initial value and strafe over until we detect balls
-	repeatUntil(getUltras() < defaultUltraSensing - BALL_WIDTH)
-	{
-		ABase(-100, 0, 0, 50);
-	}
-	AIntake(1); //Turn intake on
-	ABase(0, 100, 0, 500); //Move forward with intake still on
-	ABase(0, 0, 0, 10); //Reset base once balls have been intaken
-	AIntake(0); //Turn intake off
-	ABase(0, -100, 0, 500); //Back up to prepare for shooting
-	ABase(0, 0, -100, 250); //Aim at high goal
-	pew; //Shoot the four balls from first pyramid
-	pew;
-	pew;
-	pew;
-	AIntake(1); //Turn the intake on
-	ABase(0, 100, 0, 750); //Drive forward and intake second pyramid
-	ABase(0, 0, 0, 500); //Reset base and wait while last balls are intook
-	AIntake(0); //Turn intake off
 }
 //Predefined construct
 task usercontrol()
@@ -123,5 +105,6 @@ task usercontrol()
 	while (true)
 	{
 		EndTimeSlice();
+
 	}
 }

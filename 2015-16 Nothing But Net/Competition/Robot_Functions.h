@@ -56,17 +56,23 @@ void LauncherControl(int ball_count, int launcher_fast = 0, int launcher_slow = 
 			wait1Msec(DELAY_BETWEEN_BALLS);
 		}
 	}
-	else if(launcher_slow == 0)
+	else if(launcher_fast == 1)
 	{
 		motor[Out1] = launcher_fast * LAUNCHER_ADJUST_SPEED;
 		motor[Out2] = launcher_fast * LAUNCHER_ADJUST_SPEED;
 		motor[Out3] = launcher_fast * LAUNCHER_ADJUST_SPEED;
 	}
-	else
+	else if(launcher_slow == 1)
 	{
 		motor[Out1] = launcher_slow * LAUNCHER_SLOW_SPEED;
 		motor[Out2] = launcher_slow * LAUNCHER_SLOW_SPEED;
 		motor[Out3] = launcher_slow * LAUNCHER_SLOW_SPEED;
+	}
+	else
+	{
+		motor[Out1] = LAUNCHER_HOLD;
+		motor[Out2] = LAUNCHER_HOLD;
+		motor[Out3] = LAUNCHER_HOLD;
 	}
 }
 
@@ -75,7 +81,7 @@ Function that returns a single value for the angle of the launcher based on the 
 */
 int getAngle()
 {
-	return SensorValue[AnglePot];
+	return -SensorValue[AnglePot];
 }
 
 bool stopAngle()
@@ -90,47 +96,69 @@ Function governing the launcher angle. Takes 2 parameters:
 */
 void AngleControl(int absolute_angle, int angle_adjust = 0, int auto_angle = 0)
 {
-	if(absolute_angle > 0)
+	if(absolute_angle != 0)
 	{
-		if(getAngle() > absolute_angle) //If we are currently BELOW the desired angle
-		{
-			repeatUntil(getAngle() < absolute_angle || stopAngle())
+	}
+	else if(auto_angle == -1)
+	{
+			repeatUntil(getAngle() >= ANGLE_SHORT_RANGE || stopAngle())
 			{
-				motor[Angle] = 50;
+				motor[Angle] = 127;
 				clearLCDLine(0);
-				displayLCDNumber(0, 0, getAngle(), 6);
-				displayNextLCDString(" Aim: ");
-				displayNextLCDNumber(absolute_angle);
-				wait1Msec(100);
+				clearLCDLine(1);
+				displayLCDNumber(0, 0, getAngle());
+				displayLCDNumber(1, 0, ANGLE_SHORT_RANGE);
+				wait1Msec(1);
+			}
+			repeatUntil(getAngle() <= ANGLE_SHORT_RANGE || stopAngle())
+			{
+				motor[Angle] = -127;
+				clearLCDLine(0);
+				clearLCDLine(1);
+				displayLCDNumber(0, 0, getAngle());
+				displayLCDNumber(1, 0, ANGLE_SHORT_RANGE);
+				wait1Msec(1);
 			}
 			motor[Angle] = 0;
 		}
-		else //If we are currently ABOVE the desired angle
+		else if(auto_angle == 1)
 		{
+			motor[RFBase] = 100;
+			motor[LFBase] = 100;
+			motor[RBBase] = 100;
+			motor[LBBase] = 100;
+			wait1Msec(1000);
+			motor[RFBase] = 0;
+			motor[LFBase] = 0;
+			motor[RBBase] = 0;
+			motor[LBBase] = 0;
+			repeatUntil(getAngle() >= ANGLE_LONG_RANGE || stopAngle())
+			{
+				motor[Angle] = 127;
+				clearLCDLine(0);
+				clearLCDLine(1);
+				displayLCDNumber(0, 0, getAngle());
+				displayLCDNumber(1, 0, ANGLE_LONG_RANGE);
+				wait1Msec(1);
+			}
+			repeatUntil(getAngle() <= ANGLE_LONG_RANGE || stopAngle())
+			{
+				motor[Angle] = -127;
+				clearLCDLine(0);
+				clearLCDLine(1);
+				displayLCDNumber(0, 0, getAngle());
+				displayLCDNumber(1, 0, ANGLE_LONG_RANGE);
+				wait1Msec(1);
+			}
+			motor[Angle] = 0;
 		}
-		/*repeatUntil(closeEnough(getAngle(), absolute_angle, ANGLE_TOLERANCE) || stopAngle())
-		{
-			motor[Angle] = 127 * -sgn(absolute_angle - getAngle());
-		}*/
-	}
-	else if(auto_angle != 0)
-	{
-		switch(auto_angle)
-		{
-		case -1:
-			AngleControl(ANGLE_LONG_RANGE);
-		case 1:
-			displayLCDCenteredString(0, "Short Range");
-			AngleControl(ANGLE_SHORT_RANGE);
-		}
-	}
 	else
 	{
-		if(angle_adjust == 1 && getAngle() > ANGLE_MIN_VAL)
+		if(angle_adjust == 1 && getAngle() < ANGLE_MIN_VAL)
 		{
 			motor[Angle] = ANGLE_ADJUST_SPEED;
 		}
-		else if(angle_adjust == -1 && getAngle() < ANGLE_MAX_VAL)
+		else if(angle_adjust == -1 && getAngle() > ANGLE_MAX_VAL)
 		{
 			motor[Angle] = -ANGLE_ADJUST_SPEED;
 		}
