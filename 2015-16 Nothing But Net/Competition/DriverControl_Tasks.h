@@ -32,6 +32,7 @@ task Intaking()
 			IntakeControl(inBtn - outBtn);
 			ElevatorControl(inBtn - outBtn);
 		}
+		autoLoad();
 		EndTimeSlice();
 	}
 }
