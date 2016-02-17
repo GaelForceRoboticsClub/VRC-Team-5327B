@@ -48,11 +48,9 @@ void LauncherControl(int ball_count, int launcher_fast = 0, int launcher_slow = 
 		{
 			motor[Out1] = 127;
 			motor[Out2] = 127;
-			motor[Out3] = 127;
 			waitUntil(SensorValue[LauncherSet] == 1);
 			motor[Out1] = 0;
 			motor[Out2] = 0;
-			motor[Out3] = 0;
 			wait1Msec(DELAY_BETWEEN_BALLS);
 		}
 	}
@@ -60,19 +58,16 @@ void LauncherControl(int ball_count, int launcher_fast = 0, int launcher_slow = 
 	{
 		motor[Out1] = launcher_fast * LAUNCHER_ADJUST_SPEED;
 		motor[Out2] = launcher_fast * LAUNCHER_ADJUST_SPEED;
-		motor[Out3] = launcher_fast * LAUNCHER_ADJUST_SPEED;
 	}
 	else if(launcher_slow == 1)
 	{
 		motor[Out1] = launcher_slow * LAUNCHER_SLOW_SPEED;
 		motor[Out2] = launcher_slow * LAUNCHER_SLOW_SPEED;
-		motor[Out3] = launcher_slow * LAUNCHER_SLOW_SPEED;
 	}
 	else
 	{
 		motor[Out1] = LAUNCHER_HOLD;
 		motor[Out2] = LAUNCHER_HOLD;
-		motor[Out3] = LAUNCHER_HOLD;
 	}
 }
 
@@ -192,30 +187,22 @@ Function in charge of determining whether a ball has entered or exited the intak
 */
 void TurnstileControl(bool reset = false)
 {
-	if(reset)
-	{
-		Ball_Count = 0;
-	}
-	if(SensorValue[Turnstile] >= BALL_OUTTOOK)
-	{
-		Ball_Count++;
-	}
-	else if(SensorValue[Turnstile] <= BALL_INTOOK)
-	{
-		Ball_Count--;
-	}
-	int LED_array[4];
-	for(int i = 0; i < Ball_Count; i++)
-	{
-		LED_array[i] = 1;
-	}
-	SensorValue[Green1] = LED_array[0];
-	SensorValue[Green2] = LED_array[1];
-	SensorValue[Green3] = LED_array[2];
-	SensorValue[Red] = LED_array[3];
+	//TBD
 }
 
 int getUltras()
 {
 	return (SensorValue[BallFinder1] + SensorValue[BallFinder2]) / 2;
+}
+
+void autoLoad()
+{
+	if(SensorValue[BallSensorLauncher] <= BALL_SENSED_LAUNCHER)
+	{
+		motor[AutoLoader] = 127;
+	}
+	else //if(SensorValue[BallSensorLauncher] >= BALL_SENSED_LAUNCHER && SensorValue[BallSensor1] >= BALL_SENSED_RAMP)
+	{
+		motor[AutoLoader] = -127;
+	}
 }
