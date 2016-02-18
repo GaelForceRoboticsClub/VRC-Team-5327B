@@ -10,8 +10,14 @@ task Auton_Drive()
 		if(Auton_Drive_Array[3] > 0)
 		{
 			Auton_Drive_Array[3] -= LOOP_DELAY;
-			BaseControl(Auton_Drive_Array[0], Auton_Drive_Array[1], Auton_Drive_Array[2]);
 		}
+		else
+		{
+			Auton_Drive_Array[0] = 0;
+			Auton_Drive_Array[1] = 0;
+			Auton_Drive_Array[2] = 0;
+		}
+		BaseControl(Auton_Drive_Array[0], Auton_Drive_Array[1], Auton_Drive_Array[2]);
 		EndTimeSlice();
 	}
 }
@@ -24,6 +30,7 @@ task Auton_Intaking()
 	while(true)
 	{
 		IntakeControl(Auton_Intake_Array[0]);
+		autoLoad();
 		EndTimeSlice();
 	}
 }

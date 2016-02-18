@@ -460,45 +460,46 @@ to go
       ]
     ]
     ask balls with [shape = "nbnball"] [
-      ifelse(distancexy targetX targetY > 0.5)
+      ifelse(distancexy 5 5 > 0.5)
       [
-        fd 0.1
-        if(xcor < -0.15)
+        ifelse(distancexy 0 5 > 0.5)
         [
-          die
+          fd 0.1
+          if(xcor < -0.15)
+          [
+            die
+          ]
+          if(ycor < -0.15)
+          [
+            die
+          ]
+          if(xcor > 5.15)
+          [
+            die
+          ]
+          if(ycor > 5.15)
+          [
+            die
+          ]
         ]
-        if(ycor < -0.15)
         [
-          die
-        ]
-        if(xcor > 5.15)
-        [
-          die
-        ]
-        if(ycor > 5.15)
-        [
+          ifelse(color = orange)
+          [
+            set redscore redscore + 10
+          ]
+          [
+            set redscore redscore + 5
+          ]
           die
         ]
       ]
       [
         ifelse(color = orange)
         [
-          ifelse(alliance = "Blue")
-          [
-            set bluescore bluescore + 10
-          ]
-          [
-            set redscore redscore + 10
-          ]
+          set bluescore bluescore + 10
         ]
         [
-          ifelse(alliance = "Blue")
-          [
-            set bluescore bluescore + 5
-          ]
-          [
-            set redscore redscore + 5
-          ]
+          set bluescore bluescore + 5
         ]
         die
       ]
@@ -695,7 +696,7 @@ end
 to load
   ask robots with [startingTile = robotbeingdriven]
   [
-    if alliance = "Blue" and blueloads > 0
+    if blueloads > 0
     [
     if elevation = "None" and length capacity < 4 [
       if(cstep < 0)
@@ -722,7 +723,7 @@ to load
       ]
     ]
     ]
-    if alliance = "Red" and redloads > 0
+    if redloads > 0
     [
       if elevation = "None" and length capacity < 4 [
       if(cstep < 0)
@@ -1724,10 +1725,10 @@ NIL
 1
 
 MONITOR
-1293
-404
-1387
-449
+1343
+292
+1437
+337
 Current Frame
 currFrame
 17

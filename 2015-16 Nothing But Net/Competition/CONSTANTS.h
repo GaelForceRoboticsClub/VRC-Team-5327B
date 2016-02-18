@@ -13,8 +13,6 @@ const int LAUNCHER_SLOW_SPEED = 80; //How fast the launcher is adjusted on Slow 
 const int LAUNCHER_HOLD = 15; //How fast to move backwards so as to hold the launcher from firing
 
 //Intake Constants
-const int BALL_INTOOK = 3000; //Sensor reading of potentiometer turnstile that represents a new ball being intaken
-const int BALL_OUTTOOK = 1000; //Sensor reading of potentiometer turnstile that represents a new ball being outtaken
 const int BALL_SENSED_LAUNCHER = 2000;
 const int BALL_SENSED_RAMP = 300;
 
