@@ -65,7 +65,9 @@ int Auton_Intake_Array[1]; //Contains: Direction
 #include "Autonomous_Tasks.h"
 #include "DriverControl_Tasks.h"
 
-#define pew LauncherControl(0, 1)
+#define pew LauncherControl(1)
+
+#include "Autonomous_Skills_Routines.h"
 
 //Predefined construct
 void pre_auton()
@@ -80,7 +82,14 @@ void pre_auton()
 //Predefined construct
 task autonomous
 {
+	startTask(Auton_Aim);
+	startTask(Auton_Drive);
+	startTask(Auton_Intaking);
+	startTask(Auton_Launch);
+	string routineName = "ProgSkills1";
+	startRoutine(routineName);
 }
+
 //Predefined construct
 task usercontrol()
 {

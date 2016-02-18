@@ -8,7 +8,7 @@ task ballCounter()
 {
 	while(true)
 	{
-		TurnstileControl();
+		BallCountControl();
 		EndTimeSlice();
 	}
 }
