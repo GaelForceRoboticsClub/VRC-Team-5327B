@@ -1,5 +1,5 @@
 #pragma config(Sensor, in1,    AnglePot,       sensorPotentiometer)
-#pragma config(Sensor, in2,    BallSensorLauncher, sensorReflection)
+#pragma config(Sensor, in2,    BallSensorLauncher, sensorLineFollower)
 #pragma config(Sensor, in3,    BallSensor1,    sensorReflection)
 #pragma config(Sensor, in4,    BallSensor2,    sensorReflection)
 #pragma config(Sensor, in5,    BallSensor3,    sensorReflection)
@@ -80,20 +80,6 @@ void pre_auton()
 //Predefined construct
 task autonomous
 {
-	motor[Intake] = 127;
-	motor[Elevator] = -127;
-	motor[LFBase] = 127;
-	motor[LBBase] = 127;
-	motor[RFBase] = 127;
-	motor[RBBase] = 127;
-	wait1Msec(2500);
-	motor[Intake] = 0;
-	motor[Elevator] = 0;
-	motor[LFBase] = 0;
-	motor[LBBase] = 0;
-	motor[RFBase] = 0;
-	motor[RBBase] = 0;
-
 }
 //Predefined construct
 task usercontrol()

@@ -15,7 +15,7 @@ const int LAUNCHER_HOLD = 15; //How fast to move backwards so as to hold the lau
 //Intake Constants
 const int BALL_INTOOK = 3000; //Sensor reading of potentiometer turnstile that represents a new ball being intaken
 const int BALL_OUTTOOK = 1000; //Sensor reading of potentiometer turnstile that represents a new ball being outtaken
-const int BALL_SENSED_LAUNCHER = 500;
+const int BALL_SENSED_LAUNCHER = 2000;
 const int BALL_SENSED_RAMP = 300;
 
 //Angle Constants
