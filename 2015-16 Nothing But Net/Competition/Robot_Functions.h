@@ -149,7 +149,8 @@ void AngleControl(int absolute_angle, int angle_adjust = 0, int auto_angle = 0)
 		}
 	else
 	{
-		if(angle_adjust == 1 && getAngle() < ANGLE_MIN_VAL)
+		motor[Angle] = ANGLE_ADJUST_SPEED * angle_adjust;
+		/*if(angle_adjust == 1 && getAngle() < ANGLE_MIN_VAL)
 		{
 			motor[Angle] = ANGLE_ADJUST_SPEED;
 		}
@@ -160,7 +161,7 @@ void AngleControl(int absolute_angle, int angle_adjust = 0, int auto_angle = 0)
 		else
 		{
 			motor[Angle] = 0;
-		}
+		}*/
 	}
 }
 
@@ -185,9 +186,16 @@ void AIntake(int direction)
 /*
 Function in charge of determining whether a ball has entered or exited the intake system
 */
-void TurnstileControl(bool reset = false)
+void BallCountControl()
 {
-	//TBD
+	/*const int checkarray[][] = {{BallSensorLauncher, BALL_SENSED_LAUNCHER}, {BallSensor1, BALL_SENSED_RAMP_1}, {BallSensor2, , BallSensor3};
+	int setArray[] = {0, 0, 0, 0};
+	ballCounter = 0;
+	for(int i = 0; i < sizeof(checkarray); i++;)
+	{
+		if(SensorValue[checkarray[i]] >=
+	}*/
+
 }
 
 int getUltras()
@@ -197,7 +205,7 @@ int getUltras()
 
 void autoLoad()
 {
-	if(SensorValue[BallSensorLauncher] <= BALL_SENSED_LAUNCHER)
+	if(SensorValue[BallSensorLauncher] >= BALL_SENSED_LAUNCHER)
 	{
 		motor[AutoLoader] = 127;
 	}
