@@ -98,3 +98,12 @@ task EmergencyOverride()
 		EndTimeSlice();
 	}
 }
+
+task SoundEffects()
+{
+	if(sfxJohnCenaBtn == 1)
+	{
+		waitUntil(sfxJohnCenaBtn == 0);
+		JohnCena();
+	}
+}
