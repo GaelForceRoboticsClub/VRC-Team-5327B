@@ -1,19 +1,19 @@
 #pragma config(Sensor, in1,    AnglePot,       sensorPotentiometer)
-#pragma config(Sensor, in2,    BallSensorLauncher, sensorLineFollower)
-#pragma config(Sensor, in3,    BallSensor1,    sensorReflection)
-#pragma config(Sensor, in4,    BallSensor2,    sensorReflection)
-#pragma config(Sensor, in5,    BallSensor3,    sensorReflection)
-#pragma config(Sensor, in6,    RLine,          sensorLineFollower)
-#pragma config(Sensor, in7,    LLine,          sensorLineFollower)
+#pragma config(Sensor, in2,    BallSensorRamp, sensorLineFollower)
+#pragma config(Sensor, in3,    BallSensorElevator, sensorLineFollower)
+#pragma config(Sensor, in4,    BallSensorLauncher, sensorLineFollower)
+#pragma config(Sensor, in5,    AccelX,         sensorAccelerometer)
+#pragma config(Sensor, in6,    LLine,          sensorLineFollower)
+#pragma config(Sensor, in7,    RLine,          sensorLineFollower)
 #pragma config(Sensor, in8,    Gyro,           sensorGyro)
-#pragma config(Sensor, dgtl1,  LauncherSet,    sensorTouch)
-#pragma config(Sensor, dgtl2,  AngleSet,       sensorTouch)
-#pragma config(Sensor, dgtl3,  Green1,         sensorLEDtoVCC)
-#pragma config(Sensor, dgtl4,  Green2,         sensorLEDtoVCC)
-#pragma config(Sensor, dgtl5,  Green3,         sensorLEDtoVCC)
-#pragma config(Sensor, dgtl6,  Red,            sensorLEDtoVCC)
-#pragma config(Sensor, dgtl7,  BallFinder1,    sensorSONAR_cm)
-#pragma config(Sensor, dgtl9,  BallFinder2,    sensorSONAR_cm)
+#pragma config(Sensor, dgtl1,  Green1,         sensorLEDtoVCC)
+#pragma config(Sensor, dgtl2,  Red1,           sensorLEDtoVCC)
+#pragma config(Sensor, dgtl3,  Green2,         sensorLEDtoVCC)
+#pragma config(Sensor, dgtl4,  Red2,           sensorLEDtoVCC)
+#pragma config(Sensor, dgtl5,  BallFinder1,    sensorSONAR_mm)
+#pragma config(Sensor, dgtl7,  BallFinder2,    sensorSONAR_mm)
+#pragma config(Sensor, dgtl9,  BallSensorLauncher, sensorSONAR_mm)
+#pragma config(Sensor, dgtl11, BallSensorRamp2, sensorSONAR_mm)
 #pragma config(Motor,  port1,           Intake,        tmotorVex393_HBridge, openLoop)
 #pragma config(Motor,  port2,           Out1,          tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           RFBase,        tmotorVex393_MC29, openLoop, reversed)
@@ -34,34 +34,68 @@
 #include "Vex_Competition_Includes.c"
 //VRC Specific pragmas above
 
+//The following lines define each of the buttons and joysticks on the controller in more readable terms
 #define X_Joy -vexRT[Ch4]
 #define Y_Joy vexRT[Ch3]
 #define rot_Joy vexRT[Ch1]
 #define inBtn vexRT[Btn6U]
 #define outBtn vexRT[Btn6D]
-#define intakeModifierBtn vexRT[Btn5D]
-#define outtakeModifierBtn vexRT[Btn5U]
-#define launchFast vexRT[Btn8R]
-#define launchSlow vexRT[Btn8L]
+#define launchFast vexRT[Btn5D]
+#define launchSlow vexRT[Btn5U]
 #define angleUpBtn vexRT[Btn7U]
 #define angleDownBtn vexRT[Btn7D]
 #define angleLongBtn vexRT[Btn8D]
 #define angleShortBtn vexRT[Btn8U]
 #define overrideBtn vexRT[Btn7R]
 #define toggleSlowBtn vexRT[Btn7L]
+#define autoLoaderManual vexRT[Ch2Xmtr2]
+#define angleSetBtn vexRT[Btn8L]
+#define launchHoldToggleBtn vexRT[Btn7UXmtr2]
+#define autoIntakeToggleBtn vexRT[Btn7DXmtr2]
 
-#define sfxGreetingBtn vexRT[Btn8UXmtr2]
+//The following lines are explicitly for sound effects on the partner joystick
+#define sfxShiftBtn vexRT[Btn8R]
+#define sfxGreetingBtn vexRT[Btn7U]
+#define sfxAnothaOneBtn vexRT[Btn7L]
+#define sfxFriendBtn vexRT[Btn7D]
+#define sfxPlsBtn vexRT[Btn7R]
+#define sfxEmergencyStopBtn vexRT[Btn8L]
+
+#define sfxShift2Btn vexRT[Btn5UXmtr2]
+#define sfxAlpha2Btn vexRT[Btn5DXmtr2]
+
+#define sfxGreeting2Btn vexRT[Btn8UXmtr2]
+#define sfxAnothaOne2Btn vexRT[Btn8DXmtr2]
+#define sfxFriend2Btn vexRT[Btn8LXmtr2]
 #define sfxJohnCenaBtn vexRT[Btn8RXmtr2]
-#define sfxJeopardyBtn 0
 
-int Ball_Count = 0;
+#define sfxYesBtn vexRT[Btn8UXmtr2]
+#define sfxNoBtn vexRT[Btn8DXmtr2]
+#define sfxGLBtn vexRT[Btn8LXmtr2]
+#define sfxGGBtn vexRT[Btn8RXmtr2]
+
+#define sfxExcuseBtn vexRT[Btn8UXmtr2]
+#define sfxOkBtn vexRT[Btn8DXmtr2]
+#define sfxPls2Btn vexRT[Btn8LXmtr2]
+#define sfxThxBtn vexRT[Btn8RXmtr2]
+
+#define sfxJeopardyBtn vexRT[Btn7LXmtr2]
+#define sfxEmergencyStop2Btn vexRT[Btn7RXmtr2]
+
+//These global variables are used to manage toggle and emergency stop functions
 int emergenStop = false;
+bool elevatorOn = false;
+bool launchHoldToggle = true;
+bool autoIntakeToggle = false;
 
-int Auton_Drive_Array[4]; //Arrays that are used during autonomous in a manner similar to the motor array, contains: X, Y, Rot, and Duration
+int Auton_Drive_Array[4]; //Arrays that are used during autonomous in a manner similar to the motor array, contains: X, Y,
+													//Rot, and Duration
 int Auton_Aim_Array[2]; //Contains: Absolute and Adjust
 int Auton_Launch_Array[2]; //Contains: Ball Count and Adjust
 int Auton_Intake_Array[1]; //Contains: Direction
+int Auton_AutoLoad_Array[1]; //Contains: Direction
 
+//Include statements to reference the other header files containing specific parts of the code
 #include "CONSTANTS.h"
 #include "General_Functions.h"
 #include "Robot_Functions.h"
@@ -70,44 +104,54 @@ int Auton_Intake_Array[1]; //Contains: Direction
 #include "Autonomous_Tasks.h"
 #include "DriverControl_Tasks.h"
 
-#define pew LauncherControl(1);
+//Define a handy (and fun to use) shortcut for launching, so that we can write "pew pew pew pew" to shoot
+#define pew LauncherControl(1)
 
+//Include this file last, since it makes use of the pew reference defined above
 #include "Autonomous_Skills_Routines.h"
 
 //Predefined construct
 void pre_auton()
 {
 	bStopTasksBetweenModes = true;
-	SensorType[in4] = sensorNone; //Reset gyroscope at beginning of program
+	SensorType[in8] = sensorNone; //Reset gyroscope at beginning of program
 	wait1Msec(1000);
-	SensorType[in4] = sensorGyro;
-	wait1Msec(2000);
+	SensorType[in8] = sensorGyro;
+	wait1Msec(1000);
 }
 
 //Predefined construct
 task autonomous
 {
+	//Start necessary Autonomous control tasks
 	startTask(Auton_Aim);
 	startTask(Auton_Drive);
 	startTask(Auton_Intaking);
 	startTask(Auton_Launch);
-	string routineName = "ProgSkills1";
-	startRoutine(routineName);
+	startTask(Auton_AutoLoading);
+	string routineName = "redAuton1"; //This line allows us to manually change the routine to be run easily and quickly
+	startRoutine(routineName); //Begins the desired autonomous routine
 }
 
 //Predefined construct
 task usercontrol()
 {
+	//Start necessary tasks for user control, including Always tasks which must never be turned off
 	Always();
 	startTask(Drive);
 	startTask(Intaking);
+	startTask(autoLoading);
 	startTask(Launch);
 	startTask(Aim);
 	startTask(SoundEffects);
 	startTask(EmergencyOverride);
-	while (true)
+	startTask(sfxOverride);
+	startTask(LCD);
+	wait1Msec(500);
+	ANGLE_LONG_RANGE = 1660;
+	ANGLE_SHORT_RANGE = 1530;
+	while (true) //Keep this task going so that the Vex Competition system does not mistake the robot for disconnected
 	{
 		EndTimeSlice();
-
 	}
 }
