@@ -36,7 +36,7 @@ task autoLoading()
 {
 	while(true)
 	{
-		autoLoad(autoLoaderManual);
+		autoLoad(autoLoadInBtn, autoLoadOutBtn);
 		EndTimeSlice();
 	}
 }
@@ -47,11 +47,7 @@ task Launch()
 {
 	while(true)
 	{
-		LauncherControl(0, launchFast, launchSlow);
-		if(launchHoldToggleBtn == 1) //If the toggle button to turn off launcher hold is activated, flip the boolean variable
-		{
-			launchHoldToggle = !launchHoldToggle;
-		}
+		LauncherControl(flywheelOnBtn, flywheelMaxBtn);
 		EndTimeSlice();
 	}
 }

@@ -1,17 +1,16 @@
 void redAuton1() //4 balls preloads shot and one pyramid next to red wall
 {
-	pew;
-	pew;
-	pew;
-	pew;
+	Greeting();
 	wait1Msec(500);
-	ABase(0, 127, 0, 1500);
-	ABase(0, 0, 127, 500);
-	ABase(0, 127, 0, 500);
-	AIntake(1);
-	ABase(0, -127, 0, 500);
-	ABase(0, 127, 0, 500);
-	playTone(soundBeepBeep);
+	Vision();
+	playSound(soundBlip);
+	wait1Msec(500);
+	Scanning();
+	playSound(soundFastUpwardTones);
+	Target();
+	wait1Msec(1500);
+	motor[Out1] = 127;
+	motor[Out2] = 127;
 }
 
 void progskills1()
@@ -91,7 +90,7 @@ void startRoutine(string routineToBeStarted)
 	{
 		progskills1();
 	}
-	else if(routineToBeStarted == "autonRed1")
+	else if(routineToBeStarted == "redAuton1")
 	{
 		redAuton1();
 	}

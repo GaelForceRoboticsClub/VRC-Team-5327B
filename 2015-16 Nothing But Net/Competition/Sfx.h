@@ -21,6 +21,21 @@ void JohnCena()
   return;
 }
 
+void Vision()
+{
+	playSoundFile("Vision.wav");
+}
+
+void Scanning()
+{
+	playSoundFile("Scanning.wav");
+}
+
+void Target()
+{
+	playSoundFile("Target.wav");
+}
+
 
 void Jeopardy()
 {

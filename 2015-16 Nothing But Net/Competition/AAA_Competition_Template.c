@@ -35,13 +35,13 @@
 //VRC Specific pragmas above
 
 //The following lines define each of the buttons and joysticks on the controller in more readable terms
-#define X_Joy -vexRT[Ch4]
+#define X_Joy vexRT[Ch4]
 #define Y_Joy vexRT[Ch3]
 #define rot_Joy vexRT[Ch1]
 #define inBtn vexRT[Btn6U]
 #define outBtn vexRT[Btn6D]
-#define launchFast vexRT[Btn5D]
-#define launchSlow vexRT[Btn5U]
+#define flywheelOnBtn vexRT[Btn5D]
+#define flywheelMaxBtn vexRT[Btn6D]
 #define angleUpBtn vexRT[Btn7U]
 #define angleDownBtn vexRT[Btn7D]
 #define angleLongBtn vexRT[Btn8D]
@@ -52,13 +52,15 @@
 #define angleSetBtn vexRT[Btn8L]
 #define launchHoldToggleBtn vexRT[Btn7UXmtr2]
 #define autoIntakeToggleBtn vexRT[Btn7DXmtr2]
+#define autoLoadInBtn vexRT[Btn7R]
+#define autoLoadOutBtn vexRT[Btn7L]
 
 //The following lines are explicitly for sound effects on the partner joystick
 #define sfxShiftBtn vexRT[Btn8R]
 #define sfxGreetingBtn vexRT[Btn7U]
-#define sfxAnothaOneBtn vexRT[Btn7L]
+#define sfxAnothaOneBtn 0
 #define sfxFriendBtn vexRT[Btn7D]
-#define sfxPlsBtn vexRT[Btn7R]
+#define sfxPlsBtn 0
 #define sfxEmergencyStopBtn vexRT[Btn8L]
 
 #define sfxShift2Btn vexRT[Btn5UXmtr2]
@@ -105,7 +107,7 @@ int Auton_AutoLoad_Array[1]; //Contains: Direction
 #include "DriverControl_Tasks.h"
 
 //Define a handy (and fun to use) shortcut for launching, so that we can write "pew pew pew pew" to shoot
-#define pew LauncherControl(1)
+#define pew pewFunction()
 
 //Include this file last, since it makes use of the pew reference defined above
 #include "Autonomous_Skills_Routines.h"
@@ -124,10 +126,10 @@ void pre_auton()
 task autonomous
 {
 	//Start necessary Autonomous control tasks
-	startTask(Auton_Aim);
+	/*startTask(Auton_Aim);
 	startTask(Auton_Drive);
 	startTask(Auton_Intaking);
-	startTask(Auton_Launch);
+	startTask(Auton_Launch);*/
 	startTask(Auton_AutoLoading);
 	string routineName = "redAuton1"; //This line allows us to manually change the routine to be run easily and quickly
 	startRoutine(routineName); //Begins the desired autonomous routine
@@ -148,8 +150,7 @@ task usercontrol()
 	startTask(sfxOverride);
 	startTask(LCD);
 	wait1Msec(500);
-	ANGLE_LONG_RANGE = 1660;
-	ANGLE_SHORT_RANGE = 1530;
+	slaveMotor(Out2, Out1);
 	while (true) //Keep this task going so that the Vex Competition system does not mistake the robot for disconnected
 	{
 		EndTimeSlice();

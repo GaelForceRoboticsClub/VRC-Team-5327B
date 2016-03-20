@@ -86,47 +86,30 @@ Function governing the launcher firing. Takes 3 parameters:
 @launcher_fast : fire launcher at full speed
 @launcher_slow : fire launcher at medium speed
 */
-void LauncherControl(int ball_count, int launcher_fast = 0, int launcher_slow = 0)
+void LauncherControl(int flywheelOn, int flywheelMax = 0)
 {
 	//Shoot a fixed number of balls if specified to do so
-	if(ball_count > 0)
+	if(flywheelOn == 1)
 	{
-		repeat(ball_count)
+		if(flywheelMax == 1)
 		{
 			motor[Out1] = 127;
-			motor[Out2] = 127;
-			waitUntil(!ballInLauncher());
-			motor[Out1] = 0;
-			motor[Out2] = 0;
-			wait1Msec(DELAY_BETWEEN_BALLS);
 		}
-	}
-	else if(launcher_fast == 1)
-	{
-		//Run motors at fast speed constant
-		motor[Out1] = launcher_fast * LAUNCHER_ADJUST_SPEED;
-		motor[Out2] = launcher_fast * LAUNCHER_ADJUST_SPEED;
-	}
-	else if(launcher_slow == 1)
-	{
-		//Run motors at slow speed constant
-		motor[Out1] = launcher_slow * LAUNCHER_SLOW_SPEED;
-		motor[Out2] = launcher_slow * LAUNCHER_SLOW_SPEED;
-	}
-	else if(launchHoldToggle)
-	{
-		//Run motors at hold constant to keep launcher from being released forward from rubber bands
-		motor[Out1] = LAUNCHER_HOLD;
-		motor[Out2] = LAUNCHER_HOLD;
+		else
+		{
+			motor[Out1] = 60;
+		}
 	}
 	else
 	{
-		//Turn motors off
+		while(motor[Out1] > 0)
+		{
+			motor[Out1] -= 10;
+			wait1Msec(100);
+		}
 		motor[Out1] = 0;
-		motor[Out2] = 0;
 	}
 }
-
 /*
 Function that returns a single value for the angle of the launcher based on the combined sensor values. Takes no parameters.
 */
@@ -290,11 +273,11 @@ void BallCountControl()
 	}
 }
 
-void autoLoad(int direction)
+void autoLoad(int direction1, int direction2)
 {
-	if(abs(direction) > 5)
+	if(direction1 + direction2 != 0 && sfxShiftBtn == 1)
 	{
-		motor[AutoLoader] = 127 * sgn(direction);
+		motor[AutoLoader] = 127 * (direction1 - direction2);
 	}
 	else
 	{

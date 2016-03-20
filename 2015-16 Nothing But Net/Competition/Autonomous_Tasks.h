@@ -38,7 +38,7 @@ task Auton_AutoLoading()
 {
 	while(true)
 	{
-		autoLoad(Auton_AutoLoad_Array[0]);
+		autoLoad(Auton_AutoLoad_Array[0], 0);
 		EndTimeSlice();
 	}
 }
