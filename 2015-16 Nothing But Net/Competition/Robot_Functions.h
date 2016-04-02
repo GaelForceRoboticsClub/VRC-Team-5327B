@@ -86,29 +86,25 @@ Function governing the launcher firing. Takes 3 parameters:
 @launcher_fast : fire launcher at full speed
 @launcher_slow : fire launcher at medium speed
 */
-void LauncherControl(int flywheelOn, int flywheelMax = 0)
+void LauncherControl(int direction, int duration = 0, bool slow = false)
 {
 	//Shoot a fixed number of balls if specified to do so
-	if(flywheelOn == 1)
+	if(direction != 0)
 	{
-		if(flywheelMax == 1)
+		if(slow)
 		{
-			motor[Out1] = 127;
+			motor[Out1] = LAUNCHER_SLOW_SPEED * direction;
 		}
 		else
 		{
-			motor[Out1] = 60;
+			motor[Out1] = 127 * direction;
 		}
 	}
 	else
 	{
-		while(motor[Out1] > 0)
-		{
-			motor[Out1] -= 10;
-			wait1Msec(100);
-		}
-		motor[Out1] = 0;
+		motor[Out1] = LAUNCHER_HOLD;
 	}
+	wait1Msec(duration);
 }
 /*
 Function that returns a single value for the angle of the launcher based on the combined sensor values. Takes no parameters.
@@ -167,7 +163,14 @@ void AngleControl(int absolute_angle, int angle_adjust = 0, int auto_angle = 0)
 	else
 	{
 		//If we are using manual control, modify the angle accordingly
-		motor[Angle] = ANGLE_ADJUST_SPEED * angle_adjust;
+		if(angle_adjust != 0)
+		{
+			motor[Angle] = ANGLE_ADJUST_SPEED * angle_adjust;
+		}
+		else
+		{
+			motor[Angle] = ANGLE_HOLD;
+		}
 	}
 }
 int getUltras()
@@ -232,45 +235,6 @@ void ElevatorControl(int direction, int super = 0)
 void AIntake(int direction)
 {
 	Auton_Intake_Array[0] = direction;
-}
-/*
-Function in charge of determining whether a ball has entered or exited the intake system
-*/
-void BallCountControl()
-{
-	switch(ballInRamp() + ballInElevator() + ballInLauncher())
-	{
-	case 0:
-		SensorValue[Green1] = 0;
-		SensorValue[Red1] = 0;
-		SensorValue[Green2] = 0;
-		SensorValue[Red2] = 0;
-		break;
-	case 1:
-		SensorValue[Green1] = 1;
-		SensorValue[Red1] = 0;
-		SensorValue[Green2] = 0;
-		SensorValue[Red2] = 0;
-		break;
-	case 2:
-		SensorValue[Green1] = 1;
-		SensorValue[Red1] = 1;
-		SensorValue[Green2] = 0;
-		SensorValue[Red2] = 0;
-		break;
-	case 3:
-		SensorValue[Green1] = 1;
-		SensorValue[Red1] = 1;
-		SensorValue[Green2] = 1;
-		SensorValue[Red2] = 0;
-		break;
-	case 4:
-		SensorValue[Green1] = 1;
-		SensorValue[Red1] = 1;
-		SensorValue[Green2] = 1;
-		SensorValue[Red2] = 1;
-		break;
-	}
 }
 
 void autoLoad(int direction1, int direction2)

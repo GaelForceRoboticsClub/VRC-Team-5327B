@@ -7,7 +7,13 @@ task Drive()
 {
 	while(true)
 	{
-		BaseControl(X_Joy, Y_Joy, rot_Joy, toggleSlowBtn);
+		BaseControl(X_Joy * robotDirection, Y_Joy * robotDirection, rot_Joy, toggleSlowBtn);
+		if(directionToggleBtn == 1)
+		{
+			robotDirection *= -1;
+			SensorValue[DirectionLED] = abs(SensorValue[DirectionLED] - 1);
+			waitUntil(directionToggleBtn != 1);
+		}
 		EndTimeSlice();
 	}
 }
@@ -47,7 +53,7 @@ task Launch()
 {
 	while(true)
 	{
-		LauncherControl(flywheelOnBtn, flywheelMaxBtn);
+		LauncherControl(launchFastBtn, 0, launchSlowBtn == 1);
 		EndTimeSlice();
 	}
 }
