@@ -38,7 +38,7 @@ task Auton_AutoLoading()
 {
 	while(true)
 	{
-		autoLoad(Auton_AutoLoad_Array[0], 0);
+		motor[AutoLoader] = Auton_AutoLoad_Array[0];
 		EndTimeSlice();
 	}
 }
@@ -50,7 +50,7 @@ task Auton_Launch()
 {
 	while(true)
 	{
-		LauncherControl(Auton_Launch_Array[0], Auton_Launch_Array[1]);
+		LauncherControl(Auton_Launch_Array[0], Auton_Launch_Array[1], Auton_Launch_Array[2]);
 		EndTimeSlice();
 	}
 }
@@ -62,7 +62,7 @@ task Auton_Aim()
 {
 	while(true)
 	{
-		AngleControl(Auton_Aim_Array[0], Auton_Aim_Array[1]);
+		AngleControl(Auton_Angle_Array[0], Auton_Angle_Array[1], Auton_Angle_Array[2]);
 		EndTimeSlice();
 	}
 }
