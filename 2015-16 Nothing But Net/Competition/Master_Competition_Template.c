@@ -26,8 +26,9 @@
 /*
 BUILD DATE: 4/6/16
 AUTHOR: JS
-V4.1.1
+V5.0.0
 */
+
 //VRC Specific pragmas below
 #pragma platform(VEX)
 #pragma competitionControl(Competition)
@@ -35,6 +36,7 @@ V4.1.1
 #pragma userControlDuration(120)
 #include "Vex_Competition_Includes.c"
 //VRC Specific pragmas above
+
 //The following lines define each of the buttons and joysticks on the controller in more readable terms
 #define X_Joy vexRT[Ch4]
 #define Y_Joy vexRT[Ch3]
@@ -89,30 +91,33 @@ V4.1.1
 //These global variables are used to manage toggle and emergency stop functions
 int emergenStop = false;
 bool elevatorOn = false;
-//bool launchHoldToggle = true;
+bool launchHoldToggle = true;
 bool autoIntakeToggle = false;
 int robotDirection = 1;
 
 int Auton_Drive_Array[4]; //Arrays that are used during autonomous in a manner similar to the motor array, contains: X, Y, Rot, and Duration
-int Auton_Aim_Array[2]; //Contains: Absolute and Adjust
-int Auton_Launch_Array[2]; //Contains: Ball Count and Adjust
+int Auton_Launch_Array[3]; //Contains: Direction, Duration, and Slow
+int Auton_Angle_Array[3]; //Contains: Auto, Adjust, and Absolute
 int Auton_Intake_Array[1]; //Contains: Direction
 int Auton_AutoLoad_Array[1]; //Contains: Direction
 
 //Include statements to reference the other header files containing specific parts of the code
-#include "CONSTANTS.h"
-#include "General_Functions.h"
-#include "Robot_Functions.h"
-#include "Sfx.h"
-#include "Always_Tasks.h"
-#include "Autonomous_Tasks.h"
-#include "DriverControl_Tasks.h"
+#include "Etc/CONSTANTS.h" //All constants used in the entire program
+#include "Etc/SFX_Control.h" //Sound effects controller
+
+#include "Functions/General_Functions.h" //General functions used in the entire program
+#include "Functions/DriverControl_Functions.h" //Driver Control-specific functions
+#include "Functions/Autonomous_Functions.h" //Autonomous-specific functions
+
+#include "Tasks/General_Tasks.h" //General tasks run throughout match/competition
+#include "Tasks/DriverControl_Tasks.h" //Driver Control-specific tasks
+#include "Tasks/Autonomous_Tasks.h" //Autonomous-specific tasks
 
 //Define a handy (and fun to use) shortcut for launching, so that we can write "pew pew pew pew" to shoot
 #define pew LauncherControl(1, 500)
 
 //Include this file last, since it makes use of the pew reference defined above
-#include "Autonomous_Skills_Routines.h"
+#include "Etc/Routines.h" //All autonomous and skills routines
 
 //Predefined construct
 void pre_auton()
@@ -124,36 +129,40 @@ void pre_auton()
 	wait1Msec(1000);
 }
 
-//Predefined construct
+//Task controlling behavior during Autonomous period
 task autonomous
 {
 	//Start necessary Autonomous control tasks
-	/*startTask(Auton_Aim);
+	startTask(Auton_Aim);
 	startTask(Auton_Drive);
 	startTask(Auton_Intaking);
-	startTask(Auton_Launch);*/
+	startTask(Auton_Launch);
 	startTask(Auton_AutoLoading);
-	string routineName = "redAuton1"; //This line allows us to manually change the routine to be run easily and quickly
-	startRoutine(routineName); //Begins the desired autonomous routine
+
+	/*----------------------CHOOSE AUTON PROGRAM HERE---------------------*/
+	//Open the Playbook, find the function you want to use, and type in the
+	//function call below: (Ex: redDefensiveCapture1();)
+
+
+
+	/*------------------------CHOOSE AUTON PROGRAM HERE---------------------*/
 }
 
-//Predefined construct
+//Task controlling behavior during Driver Control period
 task usercontrol()
 {
-	//Start necessary tasks for user control, including Always tasks which must never be turned off
-	Always();
+	//Start necessary tasks for user control
 	startTask(Drive);
 	startTask(Intaking);
-	startTask(autoLoading);
+	startTask(AutoLoading);
 	startTask(Launch);
 	startTask(Aim);
 	startTask(SoundEffects);
 	startTask(EmergencyOverride);
-	startTask(sfxOverride);
+	startTask(SFXOverride);
 	startTask(LCD);
-	wait1Msec(500);
 	slaveMotor(Out2, Out1);
-	while (true) //Keep this task going so that the Vex Competition system does not mistake the robot for disconnected
+	while(true) //Keep this task going so that the Vex Competition system does not mistake the robot for disconnected
 	{
 		EndTimeSlice();
 	}

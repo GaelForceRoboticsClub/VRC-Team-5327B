@@ -26,7 +26,6 @@ task Intaking()
 	while(true)
 	{
 		IntakeControl(inBtn - outBtn, autoIntakeToggle);
-		ElevatorControl(inBtn - outBtn, inBtn + outBtn);
 		if(autoIntakeToggleBtn == 1)
 		{
 			waitUntil(autoIntakeToggleBtn == 0);
@@ -37,12 +36,13 @@ task Intaking()
 }
 
 /*
-Task that governs all code related to the AutoLoader*/
-task autoLoading()
+Task that governs all code related to the AutoLoader
+*/
+task AutoLoading()
 {
 	while(true)
 	{
-		autoLoad(autoLoadInBtn, autoLoadOutBtn);
+		AutoLoadControl(autoLoadInBtn, autoLoadOutBtn);
 		EndTimeSlice();
 	}
 }
@@ -101,7 +101,6 @@ task EmergencyOverride()
 			AngleControl(0);
 			LauncherControl(0);
 			IntakeControl(0);
-			ElevatorControl(0);
 			BaseControl(0, 0, 0);
 			for(int i = 1; i <= 10; i++) //Reset all motors in motor array to 0
 			{
@@ -294,13 +293,14 @@ task SoundEffects()
 				JohnCena();
 			}
 		}
+		EndTimeSlice();
 	}
 }
 
 /*
 Task that governs all code related to emergency stopping the sound effects
 */
-task sfxOverride()
+task SFXOverride()
 {
 	while(true)
 	{
@@ -313,6 +313,7 @@ task sfxOverride()
 			wait1Msec(1000);
 			startTask(SoundEffects);
 		}
+		EndTimeSlice();
 	}
 }
 
@@ -321,5 +322,5 @@ Task that governs all code related to LCD
 */
 task LCD()
 {
-	//Definition for now, will be worked on extensively from 2/29/16 - 3/3/16
+	//TBD
 }
