@@ -1,5 +1,6 @@
 //This header file contains the necessary functions to be run throughout the competition
 
+
 /*
 Function governing the movement of the base. Takes 4 parameters:
 @X_comp : How much we want to strafe
@@ -27,6 +28,7 @@ void BaseControl(int X_comp, int Y_comp, int rot_comp, int slow = 0, int duratio
 	motor[LBBase] = 0;
 }
 
+
 /*
 Function governing the movement of the base during Autonomous. Takes 4 parameters:
 @X_comp : How much we want to strafe
@@ -44,7 +46,12 @@ void ABase(int X_comp, int Y_comp, int rot_comp, int duration=10)
 	Auton_Drive_Array[3] = duration;
 }
 
-int ballInLauncher()
+
+/*
+Function that determines if there is currently a ball in the launcher. Returns 1 value:
+@Return : 1 if there is a ball present, 0 if there is no ball present in the launcher
+*/
+int ballInLauncher() //NOT for use with current robot, sensor positioning and constant tweaking required
 {
 	if(SensorValue[BallSensorLauncher] < BALL_SENSED_LAUNCHER)
 	{
@@ -56,15 +63,31 @@ int ballInLauncher()
 	}
 }
 
-bool turnGyro(int speed, int change, int tolerance = 50)
+
+/*
+Function allowing for a controlled turn based on gyroscope values. Takes 3 parameters:
+@speed : The desired speed of the turn, with the sign indicating direction
+@change : The desired change in current heading desired, with the sign indicating direction
+@tolerance : Default 50, how far off we can be from the exact measurement to consider a success
+*/
+void turnGyro(int speed, int change, int tolerance = 50)
 {
 	int initialGyro = 0;
 	repeat(10)
 	{
-		initialGyro += SensorValue[Gyro]
+		initialGyro += SensorValue[Gyro];
 	}
 	initialGyro /= 10;
-	repeatUntil(closeEnough(initialGyro, initialGyro + change, tolerance))
+	int targetGyro = initialGyro + change;
+	if(targetGyro > 4000)
+	{
+		targetGyro -= 4000;
+	}
+	else if(targetGyro < 0)
+	{
+		targetGyro += 4000;
+	}
+	repeatUntil(closeEnough(initialGyro, targetGyro, tolerance))
 	{
 		ABase(0, 0, speed);
 	}
