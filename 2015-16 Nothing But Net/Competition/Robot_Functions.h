@@ -34,7 +34,7 @@ Function governing the movement of the base during Autonomous. Takes 4 parameter
 @rot_comp : How much we want to rotate the robot CW/CCW
 @duration : How long to drive
 */
-void ABase(int X_comp, int Y_comp, int rot_comp, int duration)
+void ABase(int X_comp, int Y_comp, int rot_comp, int duration=10)
 {
 	//Waits until previous duration is 0 (command finished), then adds a new command to the drive array
 	waitUntil(Auton_Drive_Array[3] == 0);
@@ -54,6 +54,21 @@ int ballInLauncher()
 	{
 		return 0;
 	}
+}
+
+bool turnGyro(int speed, int change, int tolerance = 50)
+{
+	int initialGyro = 0;
+	repeat(10)
+	{
+		initialGyro += SensorValue[Gyro]
+	}
+	initialGyro /= 10;
+	repeatUntil(closeEnough(initialGyro, initialGyro + change, tolerance))
+	{
+		ABase(0, 0, speed);
+	}
+	ABase(0, 0, 0);
 }
 
 int ballInRamp()
