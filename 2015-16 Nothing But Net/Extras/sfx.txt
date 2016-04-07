@@ -2,9 +2,5 @@ John Cena:
 d=4,o=6,b=52:
 16p, 16g, 32a#, 32f, 32p, 4g, 8p, 16a#, 32a, 32f, 32p, 4g, 8p
 
-Jeopardy:d=4,o=6,b=125:c,f,c,f5,c,f,2c,c,f,c,f,a.,8g,8f,8e,8d,8c#,c,f,c,f5,c,f,2c,f.,8d,c,a#5,a5,g5,f5,p,d#,g#,d#,g#5,d#,g#,2d#,d#,g#,d#,g#,c.7,8a#,8g#,8g,8f,8e,d#,g#,d#,g#5,d#,g#,2d#,g#.,8f,d#,c#,c,p,a#5,p,g#.5,d#,g#
-
-
-Jeopardy:d=4,o=6,b=125:c,f,c,8e5,8f5, c,f,2c,c,f,c,f,a.,8g,8f,8e,8d,8c#,c,f,c,8e5, 8f5,c,f,2c,f.,8d, c, a#4, 2a, 2g6, 2f6, p
-
-Jeopardy:d=4,o=6,b=125:c,f,c,8e5,8f5, c,f,2c,c,f,c,f,a.,8g,8f,8e,8d,8c#,c,f,c,8e5, 8f5,c,f,2c,
+Jeopardy:
+d=4,o=5,b=100:c6,f6,c6,8e5,8f5,c6,f6,2c6,c6, f6, c6, f6, a6., 8g6, 8f6, 8e6, 8d6, 8c#6, c6, f6, c6,8e5,8f5,c6,f6,2c6,f6., 8d6, c6, f5, e5, d5, c5, 2f4

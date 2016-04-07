@@ -30,7 +30,15 @@ task Auton_Intaking()
 	while(true)
 	{
 		IntakeControl(Auton_Intake_Array[0]);
-		autoLoad();
+		EndTimeSlice();
+	}
+}
+
+task Auton_AutoLoading()
+{
+	while(true)
+	{
+		autoLoad(Auton_AutoLoad_Array[0], 0);
 		EndTimeSlice();
 	}
 }
