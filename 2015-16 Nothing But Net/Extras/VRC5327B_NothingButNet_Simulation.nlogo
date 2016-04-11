@@ -27,6 +27,7 @@ breed [robotSketches robotSketch]
 breed [frames frame]
 
 frames-own [
+  frameID
   currentrobot_array
   robotXs
   robotYs
@@ -38,7 +39,6 @@ frames-own [
   rScore
   bLoads
   rLoads
-  frameID
 ]
 
 balls-own [
@@ -1135,14 +1135,222 @@ to previousframe
 end
 
 to exportFilm
+  file-close-all
   file-open user-new-file
-  file-print frames_array
-  ask frames [
-    file-print frameID
-    file-print currentrobot_array
-   
+  file-print "--BEGIN FILE--"
+  file-print "--ROBOT SKETCH DETAILS--"
+  foreach robotsketch_array
+  [
+    ask robotsketches with [ID = ?]
+    [
+      file-print "--NEXT ROBOT SKETCH--"
+      file-print ID
+      file-print fdbkdrive_speed
+      file-print sidedrive_speed
+      file-print intake_sides
+      file-print primary_launcher_sides
+      file-print primary_launcher_speed
+      file-print secondary_launcher_sides
+      file-print secondary_launcher_speed
+      file-print lift_type 
+    ]
   ]
-   file-close
+  file-print "--ROBOT DETAILS--"
+  foreach robot_array
+  [
+    ask robots with [robotID = ?]
+    [
+      file-print "--NEXT ROBOT--"
+      file-print robotID
+      file-print robotSketchID
+      file-print startingTile
+    ]
+  ]
+  file-print "--FRAME DETAILS--"
+  foreach frames_array
+  [
+    ask frames with [frameID = ?]
+    [
+      file-print "--NEXT FRAME--"
+      file-print frameID
+      file-print currentrobot_array
+      file-print robotXs
+      file-print robotYs
+      file-print robotHs
+      file-print robotCaps
+      file-write robotEls
+      file-print ""
+      file-write pyramids
+      file-print ""
+      file-print bScore
+      file-print rScore
+      file-print bLoads
+      file-print rLoads
+    ]
+  ]
+  file-print "--END FILE--"
+  file-close
+end
+
+to importFilm
+  hardreset
+  file-close-all
+  file-open user-file
+  let file-info []
+  while [not file-at-end?]
+  [
+    set file-info lput file-read-line file-info
+  ]
+  let current-index 0
+  carefully
+  [
+    if not (item current-index file-info = "--BEGIN FILE--")
+    [
+      print item current-index file-info
+      error "File header was unreadable!"
+    ]
+    set current-index current-index + 1
+    if not (item current-index file-info = "--ROBOT SKETCH DETAILS--")
+    [
+      error "Robot sketches header was unreadable!"
+    ]
+    set current-index current-index + 1
+    while [item current-index file-info = "--NEXT ROBOT SKETCH--"]
+    [
+      create-robotsketches 1 [
+        set size 0
+        set ID item (current-index + 1) file-info
+        set fdbkdrive_speed read-from-string(item (current-index + 2) file-info)
+        set sidedrive_speed read-from-string(item (current-index + 3) file-info)
+        set intake_sides item (current-index + 4) file-info
+        set primary_launcher_sides item (current-index + 5) file-info
+        set primary_launcher_speed read-from-string(item (current-index + 6) file-info)
+        set secondary_launcher_sides item (current-index + 7) file-info
+        set secondary_launcher_speed read-from-string(item (current-index + 8) file-info)
+        set lift_type item (current-index + 9) file-info
+        set robotsketch_array lput ID robotsketch_array
+      ]
+      set current-index current-index + 10
+    ]
+    if not (item current-index file-info = "--ROBOT DETAILS--")
+    [
+      error "Robots header was unreadable!"
+    ]
+    set current-index current-index + 1
+    while [item current-index file-info = "--NEXT ROBOT--"]
+    [
+      create-robots 1 [
+        set shape "square"
+        set heading 0
+        set size 2
+        set robotID item (current-index + 1) file-info
+        set robot_array lput robotID robot_array
+        set robotsketchID item (current-index + 2) file-info
+        set startingTile item (current-index + 3) file-info
+        set elevation "None"
+        set capacity []
+        ifelse(startingTile = "Far Blue")
+        [
+          setxy 0 1
+          set alliance "Blue"
+        ]
+        [
+          ifelse(startingTile = "Close Blue")
+          [
+            setxy 1 0
+            set alliance "Blue"
+          ]
+          [
+            ifelse(startingTile = "Far Red")
+            [
+              setxy 5 1
+              set alliance "Red"
+            ]
+            [
+              setxy 4 0
+              set alliance "Red"
+            ]
+          ]
+        ]
+        set color (position robotID robot_array + 1) * 20 + 5
+      ]
+      create-rollers 1 [
+        set rollerID last robot_array
+        set shape (word "roller" first([intake_sides] of robotsketches with [ID = first ([robotSketchID] of robots with [robotID = last robot_array])]))
+        set heading 0
+        set size 2
+        setxy first([xcor] of robots with [robotID = last robot_array]) first([ycor] of robots with[robotID = last robot_array])
+      ]
+      create-baseDrives 1 [
+        set baseID last robot_array
+        ifelse (first([fdbkdrive_speed] of robotsketches with [ID = first([robotSketchID] of robots with [robotID = last robot_array])]) = 0)
+        [
+          set shape "driveblank"
+        ]
+        [
+          ifelse (first([sidedrive_speed] of robotsketches with [ID = first([robotSketchID] of robots with [robotID = last robot_array])]) = 0)
+          [
+            set shape "drivetank"
+          ]
+          [
+            set shape "drivex"
+          ]
+        ]
+        set heading 0
+        set size 2
+        setxy first([xcor] of robots with [robotID = last robot_array]) first([ycor] of robots with[robotID = last robot_array])
+      ]
+      create-primary-launchers 1 [
+        set plaunchID last robot_array
+        set shape (word "plaunch" first([primary_launcher_sides] of robotsketches with [ID = first ([robotSketchID] of robots with [robotID = last robot_array])]))
+        set heading 0
+        set size 2
+        setxy first([xcor] of robots with [robotID = last robot_array]) first([ycor] of robots with[robotID = last robot_array])
+      ]
+      create-secondary-launchers 1 [
+        set slaunchID last robot_array
+        set shape (word "slaunch" first([secondary_launcher_sides] of robotsketches with [ID = first ([robotSketchID] of robots with [robotID = last robot_array])]))
+        set heading 0
+        set size 2
+        setxy first([xcor] of robots with [robotID = last robot_array]) first([ycor] of robots with[robotID = last robot_array])
+      ]
+      set current-index current-index + 4
+    ]
+    if not (item current-index file-info = "--FRAME DETAILS--")
+    [
+      error "Frames header was unreadable!"
+    ]
+    set current-index current-index + 1
+    while [item current-index file-info = "--NEXT FRAME--"]
+    [
+      create-frames 1 [
+        set size 0
+        set frameID item (current-index + 1) file-info
+        set frames_array lput frameID frames_array
+        set currentrobot_array robot_array
+        set robotXs read-from-string(item (current-index + 3) file-info)
+        set robotYs read-from-string(item (current-index + 4) file-info)
+        set robotHs read-from-string(item (current-index + 5) file-info)
+        set robotCAPs read-from-string(item (current-index + 6) file-info)
+        set robotELs read-from-string(item (current-index + 7) file-info)
+        set pyramids read-from-string(item (current-index + 8) file-info)
+        set bscore read-from-string(item (current-index + 9) file-info)
+        set rscore read-from-string(item (current-index + 10) file-info)
+        set bloads read-from-string(item (current-index + 11) file-info)
+        set rloads read-from-string(item (current-index + 12) file-info)
+      ]
+      set current-index current-index + 13
+    ]
+    if not (item current-index file-info = "--END FILE--")
+    [
+      error "File footer was unreadable!"
+    ]
+  ]
+  [
+    user-message "Exception! This file may be corrupt! Double-check that this is the correct file, and try again!"
+    user-message error-message
+  ]
+  file-close-all
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1749,10 +1957,27 @@ Practice?
 BUTTON
 1066
 519
-1186
-552
+1183
+554
 Export Match Film
 exportFilm
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1183
+519
+1287
+554
+Import Match Film
+importFilm
 NIL
 1
 T
