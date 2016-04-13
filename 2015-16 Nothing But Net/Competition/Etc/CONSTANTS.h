@@ -22,7 +22,8 @@ const int AUTOLOAD_BACK = -65;
 
 //Angle Constants
 const int ANGLE_TOLERANCE = 10; //How close the sensor values for angle need to be to the desired angle to shoot
-const int ANGLE_ADJUST_SPEED = 50; //How fast the angle is adjusted when manually controlled by driver
+const int ANGLE_ADJUST_SPEED_DOWN = 50; //How fast the angle is adjusted when manually controlled by driver down
+const int ANGLE_ADJUST_SPEED_UP = 90; //How fast the angle is adjusted when manually controlled by driver up
 int ANGLE_LONG_RANGE = 1660; //The potentiometer setting for shooting long range (starting tiles)
 int ANGLE_SHORT_RANGE = 1530; //The potentiometer setting for shooting close up (midfield ish)
 const int ANGLE_MAX_VAL = -1090; //Maximum limit for launcher

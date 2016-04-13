@@ -152,14 +152,61 @@ void progskills1()
 	pew;
 }
 
-void startRoutine(string routineToBeStarted)
+void originalAutonJeffrey()
 {
-	if(routineToBeStarted == "ProgSkills1")
+	while(SensorValue[in8] >= -310)
 	{
-		progskills1();
+		motor[RFBase] = -32;
+		motor[LFBase] = 32;
+		motor[RBBase] = -32;
+		motor[LBBase] = 32;
 	}
-	else if(routineToBeStarted == "redAuton1")
+	motor[RFBase] = 0;
+	motor[LFBase] = 0;
+	motor[RBBase] = 0;
+	motor[LBBase] = 0;
+	wait1Msec(500);
+	//ABase(0, -127, 0, 2500);
+
+	motor[RFBase] = -75;
+	motor[LFBase] = -127;
+	motor[RBBase] = -75;
+	motor[LBBase] = -127;
+	wait1Msec(4000);
+	motor[RFBase] = 0;
+	motor[LFBase] = 0;
+	motor[RBBase] = 0;
+	motor[LBBase] = 0;
+
+	wait1Msec(1000);
+	motor[RFBase] = 127;
+	motor[LFBase] = -127;
+	motor[RBBase] = -127;
+	motor[LBBase] = 127;
+	wait1Msec(500);
+	motor[RFBase] = 0;
+	motor[LFBase] = 0;
+	motor[RBBase] = 0;
+	motor[LBBase] = 0;
+	/*while(SensorValue[LauncherSet] == 0)
 	{
-		redAuton1();
+	motor[Out1] = 127;
+	motor[Out2] = 127;
 	}
+	motor[Out1] = LAUNCHER_HOLD;
+	motor[Out2] = LAUNCHER_HOLD;
+	LauncherControlAuton(3);
+	while(SensorValue[BallSensorLauncher] <= 2000)
+	{
+	motor[Out1] = 127;
+	motor[Out2] = 127;
+	}
+	motor[Out1] = LAUNCHER_HOLD;
+	motor[Out2] = LAUNCHER_HOLD;
+
+
+	ABase(-32, 0, 0, 500);
+	wait1Msec(2000);
+	ABase(0, -127, 0, 2000);
+	*/
 }

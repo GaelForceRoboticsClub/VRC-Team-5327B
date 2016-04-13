@@ -37,7 +37,7 @@ Function governing the launcher firing. Takes 3 parameters:
 */
 void LauncherControl(int direction, int duration = 500, bool slow = false)
 {
-	if(duration != 0)
+	if(direction != 0)
 	{
 		if(slow)
 		{
@@ -47,15 +47,15 @@ void LauncherControl(int direction, int duration = 500, bool slow = false)
 		{
 			motor[Out1] = 127 * direction;
 		}
+		wait1Msec(duration);
 	}
-	wait1Msec(duration);
-	if(launchHoldToggle)
+	else if(launchHoldToggle && SensorValue[LauncherSet] != 1)
 	{
-		motor[Out1] = LAUNCHER_HOLD;
+		motor[Out1] = 127;
 	}
 	else
 	{
-		motor[Out1] = 0;
+		motor[Out1] = LAUNCHER_HOLD;
 	}
 }
 
@@ -68,7 +68,18 @@ Function governing the launcher angle. Takes 3 parameters:
 */
 void AngleControl(int auto_angle, int angle_adjust = 0, int absolute_angle = 0)
 {
-	//TBD
+	if(angle_adjust == 1)
+	{
+		motor[Angle] = ANGLE_ADJUST_SPEED_UP;
+	}
+	else if(angle_adjust == -1)
+	{
+		motor[Angle] = -ANGLE_ADJUST_SPEED_DOWN;
+	}
+	else
+	{
+		motor[Angle] = ANGLE_HOLD;
+	}
 }
 
 
@@ -105,103 +116,16 @@ void IntakeControl(int direction, bool autoIntakeOn = false)
 	else
 	{
 		motor[Intake] = 127 * direction;
+		motor[Elevator] = 127 * direction;
 	}
 }
 
 /*
 Function governing the autoloading system. Takes 2 parameters:
-@overrideActive : whether or not we should enable the override of autoloading
-@overrideDirection : which direction we should override and enable autoloader
+@overrideIn : override autoloading in
+@overrideOut : override autoloading out
 */
-void AutoLoadControl(int overrideActive, int overrideDirection)
+void AutoLoadControl(int overrideIn, int overrideOut)
 {
-	if(overrideActive == 1 && overrideDirection != 0)
-	{
-		motor[AutoLoader] = 127 * overrideDirection;
-	}
-	else
-	{
-		if(ballInLauncher()) //Ball in launcher
-		{
-			if(ballInRamp()) //Ball in Launcher and Ball on ramp
-			{
-				if(ballInElevator()) //Ball in Launcher and Ball on ramp and Ball in elevator
-				{
-					//Keep ball in ramp away
-					motor[AutoLoader] = AUTOLOAD_BACK;
-				}
-				else //Ball in Launcher and Ball on ramp and Ball NOT in elevator
-				{
-					//Keep ball in ramp away
-					motor[AutoLoader] = AUTOLOAD_BACK;
-				}
-			}
-			else //Ball in Launcher and Ball NOT on ramp
-			{
-				if(ballInElevator()) //Ball in Launcher and Ball NOT on ramp and Ball in elevator
-				{
-					//Keep ramp away, and bring from elevator to ramp
-					motor[AutoLoader] = AUTOLOAD_BACK;
-					repeatUntil(ballInRamp())
-					{
-						elevatorOn = true;
-					}
-					elevatorOn = false;
-				}
-				else //Ball in Launcher and Ball NOT on ramp and Ball NOT in elevator
-				{
-					//Nothing to do
-					motor[AutoLoader] = 0;
-					elevatorOn = false;
-				}
-			}
-		}
-		else //Ball NOT in Launcher
-		{
-			if(ballInRamp()) //Ball NOT in Launcher and Ball on ramp
-			{
-				if(ballInElevator()) //Ball NOT in Launcher and Ball on ramp and Ball in elevator
-				{
-					//Bring the ball from the ramp to the launcher, then from the elevator to the ramp
-					repeatUntil(ballInLauncher())
-					{
-						motor[AutoLoader] = AUTOLOAD_FORWARD;
-					}
-					motor[AutoLoader] = 0;
-					repeatUntil(ballInRamp())
-					{
-						elevatorOn = true;
-					}
-					elevatorOn = false;
-				}
-				else //Ball NOT in Launcher and Ball on ramp and Ball NOT in elevator
-				{
-					//Bring the ball from the ramp to the Launcher
-					repeatUntil(ballInLauncher())
-					{
-						motor[AutoLoader] = AUTOLOAD_FORWARD;
-					}
-					motor[AutoLoader] = 0;
-				}
-			}
-			else //Ball NOT in Launcher and Ball NOT on ramp
-			{
-				if(ballInElevator()) //Ball NOT in Launcher and Ball NOT on ramp and Ball in elevator
-				{
-					//Bring the ball from elevator to the ramp
-					repeatUntil(ballInRamp())
-					{
-						elevatorOn = true;
-					}
-					elevatorOn = false;
-				}
-				else //Ball NOT in Launcher and Ball NOT on ramp and Ball NOT in elevator
-				{
-					//Do nothing, because we have NO balls at all
-					motor[AutoLoader] = 0;
-					elevatorOn = false;
-				}
-			}
-		}
-	}
+	motor[AutoLoader] = 127 * (overrideIn - overrideOut);
 }
