@@ -14,6 +14,8 @@ globals [
   currFrame
   lastTimeFramed
   pyramids_array
+  TURN_SCALE
+  DRIVE_SCALE
   ]
 breed [tiles tile]
 breed [tape tapesing]
@@ -109,6 +111,8 @@ to reset-field
   set fireCheck 0
   set BlueScore 0
   set RedScore 0
+  set TURN_SCALE 0.05
+  set DRIVE_SCALE 1
   clear-output
   ask balls with [shape = "nbnpyramid"]
   [
@@ -1359,26 +1363,64 @@ end
 to generateCode
   file-close-all
   file-open user-new-file
-  let currentFrameCode 0
+  let fileName user-input "Enter a name for this routine:"
+  file-print "//Automatically generated code via VRC 5327B NbN Simulation"
+  file-print (word "void " fileName "()")
+  file-print "{"
+  let currentFrameCode 1
   let initialX 0
   let initialY 0
+  let initialH 0
   let endX 0
   let endY 0
+  let endH 0
   let desiredRobotIndex 0
   ask robots with [startingtile = robotbeingdriven]
   [
     set desiredRobotIndex position robotID robot_array
   ]
+  ask frames with [frameID = item 0 frames_array]
+    [
+      set endX item desiredRobotIndex robotXs
+      set endY item desiredRobotIndex robotYs
+      set endH item desiredRobotIndex robotHs
+    ]
   while [currentFrameCode < length frames_array]
   [
     set initialX endX
     set initialY endY
-    ask frame with [frameID = position currentFrameCode frames_array]
+    set initialH endH
+    ask frames with [frameID = item currentFrameCode frames_array]
     [
-      set endX position desiredRobotIndex robotXs
-      set endY position desiredRobotIndex robotYs
+      set endX item desiredRobotIndex robotXs
+      set endY item desiredRobotIndex robotYs
+      set endH item desiredRobotIndex robotHs
     ]
+    if endH != initialH
+    [
+      let turn abs(TURN_SCALE * (initialH - endH))
+      ifelse initialH < endH
+      [
+        file-print (word "  ABase(0, 0, 127, " turn ");")
+      ]
+      [
+        file-print (word "  ABase(0, 0, -127, " turn ");")
+      ]
+    ]
+    if endX != initialX or endY != initialY
+    [
+      let distanceToTravel sqrt((endX - initialX) ^ 2 + (endY - initialY) ^ 2)
+      let straight distanceToTravel * DRIVE_SCALE
+      let xcomp endX - initialX
+      let ycomp endY - initialY
+      let angle (atan xcomp ycomp) - initialH
+      let xpower round(127 * cos(angle))
+      let ypower round(127 * sin(angle)) 
+      file-print (word "  ABase(" xpower ", " ypower ", 0, " round(straight) ");")
+    ]
+    set currentFrameCode currentFrameCode + 1
   ]
+  file-print "}"
   file-close-all
 end
 @#$#@#$#@

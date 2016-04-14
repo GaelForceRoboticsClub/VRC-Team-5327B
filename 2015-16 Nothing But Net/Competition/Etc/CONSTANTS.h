@@ -2,7 +2,7 @@
 //EDIT WITH CAUTION!
 
 //General Constants:
-const int LOOP_DELAY = 10; //How long between each refresh of the while loops governing robot code, used because we do not need 1000 refreshes per second
+const int LOOP_DELAY = 1; //How long between each refresh of the while loops governing robot code, used because we do not need 1000 refreshes per second
 const unsigned int TrueSpeed[128] =
 {
 	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
