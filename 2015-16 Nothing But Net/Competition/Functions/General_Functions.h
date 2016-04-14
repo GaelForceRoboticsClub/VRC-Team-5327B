@@ -66,6 +66,23 @@ int ballInElevator()
 
 
 /*
+Function that determines if a ball is ready to be put in launcher. Returns 1 value:
+@return : 1 if a ball can be added, 0 if no ball can be added
+*/
+int ballLauncherReady()
+{
+	if(closeEnough(vexRT[X_Joy], 0, 25) && closeEnough(vexRT[Y_Joy], 0, 25))
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+
+/*
 Function that determines the current angle of the launcher. Returns 1 value:
 @return : 0-1023 based on potentiometer values
 */

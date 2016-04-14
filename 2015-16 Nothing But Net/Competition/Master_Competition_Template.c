@@ -1,8 +1,7 @@
-#pragma config(Sensor, in1,    AnglePot,       sensorPotentiometer)
-#pragma config(Sensor, in2,    BallSensorRamp, sensorLineFollower)
-#pragma config(Sensor, in3,    BallSensorElevator, sensorLineFollower)
-#pragma config(Sensor, in4,    BallSensorLauncher, sensorLineFollower)
-#pragma config(Sensor, in5,    AccelX,         sensorAccelerometer)
+#pragma config(Sensor, in4,    AnglePot,       sensorPotentiometer)
+#pragma config(Sensor, in1,    BallSensorRamp, sensorLineFollower)
+#pragma config(Sensor, in2,    BallSensorElevator, sensorLineFollower)
+#pragma config(Sensor, in3,    BallSensorLauncher, sensorLineFollower)
 #pragma config(Sensor, in6,    LLine,          sensorLineFollower)
 #pragma config(Sensor, in7,    RLine,          sensorLineFollower)
 #pragma config(Sensor, in8,    Gyro,           sensorGyro)
@@ -97,6 +96,7 @@ V5.1.0
 int emergenStop = false;
 bool launchHoldToggle = true;
 bool autoIntakeToggle = false;
+bool elevatorOn = false;
 int robotDirection = 1;
 
 int Auton_Drive_Array[4]; //Arrays that are used during autonomous in a manner similar to the motor array, contains: X, Y, Rot, and Duration

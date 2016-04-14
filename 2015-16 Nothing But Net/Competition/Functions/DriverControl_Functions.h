@@ -17,10 +17,14 @@ void BaseControl(int X_comp, int Y_comp, int rot_comp, int slow = 0, int duratio
 	Rotation is positive for CW, negative for CCW
 	*/
 	rot_comp = rot_comp * (1 - (0.75 * slow));
-	motor[RFBase] = Y_comp - X_comp - rot_comp;
-	motor[LFBase] = Y_comp + X_comp + rot_comp;
-	motor[RBBase] = Y_comp + X_comp - rot_comp;
-	motor[LBBase] = Y_comp - X_comp + rot_comp;
+	int RF = Y_comp - X_comp - rot_comp;
+	int LF = Y_comp + X_comp + rot_comp;
+	int RB = Y_comp + X_comp - rot_comp;
+	int LB = Y_comp - X_comp + rot_comp;
+	motor[RFBase] = TrueSpeed[abs(RF)] * sgn(RF);
+	motor[LFBase] = TrueSpeed[abs(LF)] * sgn(LF);
+	motor[RBBase] = TrueSpeed[abs(RB)] * sgn(RB);
+	motor[LBBase] = TrueSpeed[abs(LB)] * sgn(LB);
 	wait1Msec(duration);
 	motor[RFBase] = 0;
 	motor[LFBase] = 0;
@@ -116,7 +120,17 @@ void IntakeControl(int direction, bool autoIntakeOn = false)
 	else
 	{
 		motor[Intake] = 127 * direction;
-		motor[Elevator] = 127 * direction;
+		if(elevatorOn)
+		{
+			motor[Elevator] = -127;
+			waitUntil(ballInRamp() == 1);
+			wait1Msec(250);
+			motor[Elevator] = 0;
+		}
+		else
+		{
+			motor[Elevator] = 127 * direction;
+		}
 	}
 }
 
@@ -127,5 +141,153 @@ Function governing the autoloading system. Takes 2 parameters:
 */
 void AutoLoadControl(int overrideIn, int overrideOut)
 {
-	motor[AutoLoader] = 127 * (overrideIn - overrideOut);
+	if(overrideIn == 0 && overrideOut == 0)
+	{
+		if(ballInElevator() == 1)
+		{
+			if(ballInRamp() == 1)
+			{
+				if(ballInLauncher() == 1)
+				{
+					if(ballLauncherReady() == 1)
+					{
+						//Everything is full, so repel balls
+						elevatorOn = false;
+						motor[AutoLoader] = -127;
+					}
+					else
+					{
+						//Everything is full, so do nothing
+						elevatorOn = false;
+						motor[AutoLoader] = -127;
+					}
+				}
+				else
+				{
+					if(ballLauncherReady() == 1)
+					{
+						//Launcher is empty and ready
+						motor[AutoLoader] = 127;
+						//Bring in next ball
+						elevatorOn = true;
+					}
+					else
+					{
+						//Launcher not ready, so repel balls
+						motor[AutoLoader] = -127;
+						elevatorOn = false;
+					}
+				}
+			}
+			else
+			{
+				if(ballInLauncher() == 1)
+				{
+					if(ballLauncherReady() == 1)
+					{
+						//Ramp is empty, so bring up from elevator
+						elevatorOn = true;
+						motor[AutoLoader] = 0;
+					}
+					else
+					{
+						//Ramp is empty, so bring up from elevator
+						elevatorOn = true;
+						motor[AutoLoader] = 0;
+					}
+				}
+				else
+				{
+					if(ballLauncherReady() == 1)
+					{
+						//Launcher is empty and ready
+						motor[AutoLoader] = 127;
+						//Bring in next ball
+						elevatorOn = true;
+					}
+					else
+					{
+						//Ramp is empty, so bring up from elevator
+						elevatorOn = true;
+						motor[AutoLoader] = 0;
+					}
+				}
+			}
+		}
+		else
+		{
+			if(ballInRamp() == 1)
+			{
+				if(ballInLauncher() == 1)
+				{
+					if(ballLauncherReady() == 1)
+					{
+						//Pushed all the way up so repel balls
+						motor[AutoLoader] = -127;
+						elevatorOn = false;
+					}
+					else
+					{
+						//Pushed all the way up so repel balls
+						motor[AutoLoader] = -127;
+						elevatorOn = false;
+					}
+				}
+				else
+				{
+					if(ballLauncherReady() == 1)
+					{
+						//Launcher is empty and ready
+						motor[AutoLoader] = 127;
+						//Bring in next ball
+						elevatorOn = false;
+					}
+					else
+					{
+						//Launcher not ready, so repel balls
+						motor[AutoLoader] = -127;
+						elevatorOn = false;
+					}
+				}
+			}
+			else
+			{
+				if(ballInLauncher() == 1)
+				{
+					if(ballLauncherReady() == 1)
+					{
+						//Everything has been pushed forward, so do nothing
+						motor[AutoLoader] = 0;
+						elevatorOn = false;
+					}
+					else
+					{
+						//Everything has been pushed forward, so do nothing
+						motor[AutoLoader] = 0;
+						elevatorOn = false;
+					}
+				}
+				else
+				{
+					if(ballLauncherReady() == 1)
+					{
+						//Launcher is empty and ready
+						motor[AutoLoader] = 0;
+						//Bring in next ball
+						elevatorOn = false;
+					}
+					else
+					{
+						//Launcher not ready, so do nothing
+						motor[AutoLoader] = 0;
+						elevatorOn = false;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		motor[AutoLoader] = 127 * (overrideIn - overrideOut);
+	}
 }
