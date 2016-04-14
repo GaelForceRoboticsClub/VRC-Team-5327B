@@ -17,19 +17,15 @@ void BaseControl(int X_comp, int Y_comp, int rot_comp, int slow = 0, int duratio
 	Rotation is positive for CW, negative for CCW
 	*/
 	rot_comp = rot_comp * (1 - (0.75 * slow));
-	int RF = Y_comp - X_comp - rot_comp;
-	int LF = Y_comp + X_comp + rot_comp;
-	int RB = Y_comp + X_comp - rot_comp;
-	int LB = Y_comp - X_comp + rot_comp;
-	motor[RFBase] = TrueSpeed[abs(RF)] * sgn(RF);
-	motor[LFBase] = TrueSpeed[abs(LF)] * sgn(LF);
-	motor[RBBase] = TrueSpeed[abs(RB)] * sgn(RB);
-	motor[LBBase] = TrueSpeed[abs(LB)] * sgn(LB);
-	wait1Msec(duration);
+	motor[RFBase] = Y_comp - X_comp - rot_comp;
+	motor[LFBase] = Y_comp + X_comp + rot_comp;
+	motor[RBBase] = Y_comp + X_comp - rot_comp;
+	motor[LBBase] = Y_comp - X_comp + rot_comp;
+	/*wait1Msec(duration);
 	motor[RFBase] = 0;
 	motor[LFBase] = 0;
 	motor[RBBase] = 0;
-	motor[LBBase] = 0;
+	motor[LBBase] = 0;*/
 }
 
 
