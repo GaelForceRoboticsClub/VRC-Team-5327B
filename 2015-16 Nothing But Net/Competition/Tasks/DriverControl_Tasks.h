@@ -327,5 +327,11 @@ Task that governs all code related to LCD
 */
 task LCD()
 {
-	//TBD
+	while(true)
+	{
+		LCDControl(nLCDButtons, SensorValue[CursorPot], SensorValue[CursorClick]);
+		LCDDisplay();
+		wait1Msec(nLCDRefreshRate);
+		EndTimeSlice();
+	}
 }

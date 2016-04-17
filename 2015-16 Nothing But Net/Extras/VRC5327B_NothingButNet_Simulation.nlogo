@@ -1106,7 +1106,7 @@ to dispFrame [frameBeingDisp]
         ifelse (item counter ([pyramids] of actualFrame)) = "Standing"
         [
           set status "Standing"
-          set size 1.5
+          set size 10
         ]
         [
           set status "Intaken"
@@ -1392,6 +1392,7 @@ to generateCode
     set initialH endH
     ask frames with [frameID = item currentFrameCode frames_array]
     [
+      file-print word "  //" frameID
       set endX item desiredRobotIndex robotXs
       set endY item desiredRobotIndex robotYs
       set endH item desiredRobotIndex robotHs
@@ -1401,10 +1402,10 @@ to generateCode
       let turn abs(TURN_SCALE * (initialH - endH))
       ifelse initialH < endH
       [
-        file-print (word "  ABase(0, 0, 127, " turn ");")
+        file-print (word "  ABase(0, 0, 127, " round(turn) ");")
       ]
       [
-        file-print (word "  ABase(0, 0, -127, " turn ");")
+        file-print (word "  ABase(0, 0, -127, " round(turn) ");")
       ]
     ]
     if endX != initialX or endY != initialY
@@ -2060,10 +2061,10 @@ NIL
 1
 
 BUTTON
-1167
-586
-1328
-619
+1067
+565
+1288
+598
 Generate RobotC Code
 generateCode
 NIL

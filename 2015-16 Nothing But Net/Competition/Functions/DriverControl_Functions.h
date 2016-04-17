@@ -21,11 +21,6 @@ void BaseControl(int X_comp, int Y_comp, int rot_comp, int slow = 0, int duratio
 	motor[LFBase] = Y_comp + X_comp + rot_comp;
 	motor[RBBase] = Y_comp + X_comp - rot_comp;
 	motor[LBBase] = Y_comp - X_comp + rot_comp;
-	/*wait1Msec(duration);
-	motor[RFBase] = 0;
-	motor[LFBase] = 0;
-	motor[RBBase] = 0;
-	motor[LBBase] = 0;*/
 }
 
 
@@ -49,10 +44,6 @@ void LauncherControl(int direction, int duration = 500, bool slow = false)
 		}
 		wait1Msec(duration);
 	}
-	else if(launchHoldToggle && SensorValue[LauncherSet] != 1)
-	{
-		motor[Out1] = 127;
-	}
 	else
 	{
 		motor[Out1] = LAUNCHER_HOLD;
@@ -68,17 +59,21 @@ Function governing the launcher angle. Takes 3 parameters:
 */
 void AngleControl(int auto_angle, int angle_adjust = 0, int absolute_angle = 0)
 {
-	if(angle_adjust == 1)
+	if(angle_adjust == 1 && !emergenStop)
 	{
 		motor[Angle] = ANGLE_ADJUST_SPEED_UP;
 	}
-	else if(angle_adjust == -1)
+	else if(angle_adjust == -1 && !emergenStop && SensorValue[LauncherBottomLimit] == 0)
 	{
 		motor[Angle] = -ANGLE_ADJUST_SPEED_DOWN;
 	}
 	else
 	{
 		motor[Angle] = ANGLE_HOLD;
+	}
+	if(SensorValue[LauncherBottomLimit] == 1)
+	{
+		playSound(soundBlip);
 	}
 }
 
@@ -116,17 +111,11 @@ void IntakeControl(int direction, bool autoIntakeOn = false)
 	else
 	{
 		motor[Intake] = 127 * direction;
-		if(elevatorOn)
+		while(elevatorOn && ballInRamp() != 1 && direction == 0)
 		{
 			motor[Elevator] = -127;
-			waitUntil(ballInRamp() == 1);
-			wait1Msec(250);
-			motor[Elevator] = 0;
 		}
-		else
-		{
-			motor[Elevator] = 127 * direction;
-		}
+		motor[Elevator] = 127 * direction;
 	}
 }
 
@@ -286,4 +275,272 @@ void AutoLoadControl(int overrideIn, int overrideOut)
 	{
 		motor[AutoLoader] = 127 * (overrideIn - overrideOut);
 	}
+}
+
+/*
+Possible context level 0: On, Off
+Possible context level 1: Auton, Battery
+Possible context level 2: Close Red, Far Red, Close Blue, Far Blue
+Possible context level 3: Whatever the autons are
+*/
+string context[4] = {"Off", "Null", "Null", "Null"};
+int cursor = 0;
+string autonToRun = "";
+void LCDControl(int buttons, int wheelCursor, int wheelButton)
+{
+	clearLCDLine(0);
+	clearLCDLine(1);
+	cursor = wheelCursor;
+	if(buttons == 1) //Left Button
+	{
+		if(context[0] == "On")
+		{
+			context[1] = "Auton";
+			context[2] = "Null";
+			context[3] = "Null";
+		}
+	}
+	else if(buttons == 2) //Center Button
+	{
+		if(context[0] == "Off")
+		{
+			context[0] = "On";
+			context[1] = "Auton";
+			context[2] = "Null";
+			context[3] = "Null";
+		}
+		else
+		{
+			context[0] = "Off";
+			context[1] = "Null";
+			context[2] = "Null";
+			context[3] = "Null";
+		}
+	}
+	else if(buttons == 4) //Right Button
+	{
+		if(context[0] == "On")
+		{
+			context[1] = "Battery";
+			context[2] = "Null";
+			context[3] = "Null";
+		}
+	}
+	if(context[1] == "Auton" && context[2] == "Null" && wheelButton == 1)
+	{
+		if(cursor < 1024)
+		{
+			context[2] = "Red Far";
+			context[3] = "Null";
+		}
+		else if (cursor < 2048)
+		{
+			context[2] = "Red Close";
+			context[3] = "Null";
+		}
+		else if (cursor < 3071)
+		{
+			context[2] = "Blue Far";
+			context[3] = "Null";
+		}
+		else
+		{
+			context[2] = "Blue Close";
+			context[3] = "Null";
+		}
+	}
+	if(context[2] == "Red Far" && context[3] == "Null" && wheelButton == 1)
+	{
+		if(cursor < 1024)
+		{
+			context[3] = "RFAuto1";
+		}
+		else if (cursor < 2048)
+		{
+			context[3] = "RFAuto2";
+		}
+		else if (cursor < 3071)
+		{
+			context[3] = "RFAuto3";
+		}
+		else
+		{
+			context[3] = "RFAuto4";
+		}
+	}
+	else if(context[2] == "Red Close" && context[3] == "Null" && wheelButton == 1)
+	{
+		if(cursor < 1024)
+		{
+			context[3] = "RCAuto1";
+		}
+		else if (cursor < 2048)
+		{
+			context[3] = "RCAuto2";
+		}
+		else if (cursor < 3071)
+		{
+			context[3] = "RCAuto3";
+		}
+		else
+		{
+			context[3] = "RCAuto4";
+		}
+	}
+	else if(context[2] == "Blue Far" && context[3] == "Null" && wheelButton == 1)
+	{
+		if(cursor < 1024)
+		{
+			context[3] = "BFAuto1";
+		}
+		else if (cursor < 2048)
+		{
+			context[3] = "BFAuto2";
+		}
+		else if (cursor < 3071)
+		{
+			context[3] = "BFAuto3";
+		}
+		else
+		{
+			context[3] = "BFAuto4";
+		}
+	}
+	else if(context[2] == "Blue Close" && context[3] == "Null" && wheelButton == 1)
+	{
+		if(cursor < 1024)
+		{
+			context[3] = "BCAuto1";
+		}
+		else if (cursor < 2048)
+		{
+			context[3] = "BCAuto2";
+		}
+		else if (cursor < 3071)
+		{
+			context[3] = "BCAuto3";
+		}
+		else
+		{
+			context[3] = "BCAuto4";
+		}
+	}
+	autonToRun = context[3];
+}
+void LCDDisplay()
+{
+	string line0 = "";
+	string line1 = "";
+	//Check context level 0 (on/off)
+	if(context[0] == "Off")
+	{
+		bLCDBacklight = false;
+	}
+	else if(context[0] == "On")
+	{
+		bLCDBacklight = true;
+		line1 = "Auton  I/O  Batt";
+	}
+	//Check context level 1 (battery / auton)
+	if(context[1] == "Auton")
+	{
+		if(cursor < 1024)
+		{
+			line0 = "Red Far";
+		}
+		else if (cursor < 2048)
+		{
+			line0 = "Red Close";
+		}
+		else if (cursor < 3071)
+		{
+			line0 = "Blue Far";
+		}
+		else
+		{
+			line0 = "Blue Close";
+		}
+	}
+	else if(context[1] == "Battery")
+	{
+		sprintf(line0, "%s%1.1f%c%s%1.1f%c", "M: ", nImmediateBatteryLevel / 1000.0, 'V', "  S: ", BackupBatteryLevel / 1000.0, 'V');
+	}
+	if (context[2] == "Red Far")
+	{
+		if(cursor < 1024)
+		{
+			line0 = "RFAuto1";
+		}
+		else if (cursor < 2048)
+		{
+			line0 = "RFAuto2";
+		}
+		else if (cursor < 3071)
+		{
+			line0 = "RFAuto3";
+		}
+		else
+		{
+			line0 = "RFAuto4";
+		}
+	}
+	else if (context[2] == "Red Close")
+	{
+		if(cursor < 1024)
+		{
+			line0 = "RCAuto1";
+		}
+		else if (cursor < 2048)
+		{
+			line0 = "RCAuto2";
+		}
+		else if (cursor < 3071)
+		{
+			line0 = "RCAuto3";
+		}
+		else
+		{
+			line0 = "RCAuto4";
+		}
+	}
+	else if (context[2] == "Blue Far")
+	{
+		if(cursor < 1024)
+		{
+			line0 = "BFAuto1";
+		}
+		else if (cursor < 2048)
+		{
+			line0 = "BFAuto2";
+		}
+		else if (cursor < 3071)
+		{
+			line0 = "BFAuto3";
+		}
+		else
+		{
+			line0 = "BFAuto4";
+		}
+	}
+	else if (context[2] == "Blue Close")
+	{
+		if(cursor < 1024)
+		{
+			line0 = "BCAuto1";
+		}
+		else if (cursor < 2048)
+		{
+			line0 = "BCAuto2";
+		}
+		else if (cursor < 3071)
+		{
+			line0 = "BCAuto3";
+		}
+		else
+		{
+			line0 = "BCAuto4";
+		}
+	}
+	displayLCDCenteredString(0, line0);
+	displayLCDCenteredString(1, line1);
 }

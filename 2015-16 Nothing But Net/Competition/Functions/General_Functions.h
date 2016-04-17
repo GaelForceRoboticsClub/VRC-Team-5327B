@@ -98,7 +98,7 @@ Function that determines whether or not we should stop the angle changing mechan
 */
 bool stopAngle()
 {
-	return emergenStop || closeEnough(getAngle(), ANGLE_MAX_VAL, ANGLE_TOLERANCE) || closeEnough(getAngle(), ANGLE_MIN_VAL, ANGLE_TOLERANCE);
+	return (emergenStop || SensorValue[LauncherBottomLimit] == 1);
 }
 
 /*

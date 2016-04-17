@@ -1,0 +1,19 @@
+--BEGIN FILE--
+--ROBOT SKETCH DETAILS--
+--NEXT ROBOT SKETCH--
+5327B-sketch
+1.25
+1.25
+Front
+Back
+2
+None
+0
+None
+--ROBOT DETAILS--
+--NEXT ROBOT--
+5327B
+5327B-sketch
+Far Blue
+--FRAME DETAILS--
+--END FILE--
