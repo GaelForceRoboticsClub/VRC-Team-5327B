@@ -1,19 +1,19 @@
 #pragma config(Sensor, in1,    BallSensorRamp, sensorLineFollower)
 #pragma config(Sensor, in2,    BallSensorElevator, sensorLineFollower)
 #pragma config(Sensor, in3,    BallSensorLauncher, sensorLineFollower)
-#pragma config(Sensor, in4,    AnglePot,       sensorPotentiometer)
-#pragma config(Sensor, in5,    CursorPot,      sensorPotentiometer)
+#pragma config(Sensor, in4,    CursorPot,      sensorPotentiometer)
+#pragma config(Sensor, in5,    AnglePot,       sensorPotentiometer)
 #pragma config(Sensor, in6,    LLine,          sensorLineFollower)
 #pragma config(Sensor, in7,    RLine,          sensorLineFollower)
 #pragma config(Sensor, in8,    Gyro,           sensorGyro)
 #pragma config(Sensor, dgtl1,  LauncherSet,    sensorTouch)
 #pragma config(Sensor, dgtl2,  DirectionLED,   sensorLEDtoVCC)
 #pragma config(Sensor, dgtl3,  DirectionLED2,  sensorLEDtoVCC)
-#pragma config(Sensor, dgtl4,  LauncherBottomLimit, sensorNone)
+#pragma config(Sensor, dgtl4,  LauncherBottomLimit, sensorTouch)
 #pragma config(Sensor, dgtl5,  BallFinder1,    sensorSONAR_mm)
 #pragma config(Sensor, dgtl7,  BallFinder2,    sensorSONAR_mm)
 #pragma config(Sensor, dgtl9,  BallFinder3,    sensorSONAR_mm)
-#pragma config(Sensor, dgtl11, CursorClick,    sensorTouch)
+#pragma config(Sensor, dgtl12, CursorClick,    sensorTouch)
 #pragma config(Motor,  port1,           Angle,         tmotorVex393_HBridge, openLoop)
 #pragma config(Motor,  port2,           Out1,          tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           RFBase,        tmotorVex393_MC29, openLoop, reversed)
@@ -131,13 +131,11 @@ void pre_auton()
 {
 	bStopTasksBetweenModes = true;
 	SensorType[in8] = sensorNone; //Reset gyroscope at beginning of program
-	wait1Msec(1000);
 	SensorType[in8] = sensorGyro;
-	wait1Msec(1000);
 }
 
 //Task controlling behavior during Autonomous period
-task usercontrol()
+task autonomous()
 {
 	//Start necessary Autonomous control tasks
 	startTask(Auton_Aim);
@@ -160,7 +158,7 @@ task usercontrol()
 }
 
 //Task controlling behavior during Driver Control period
-task autonomous()
+task usercontrol()
 {
 	//Start necessary tasks for user control
 	startTask(Drive);

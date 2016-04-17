@@ -286,6 +286,9 @@ Possible context level 3: Whatever the autons are
 string context[4] = {"Off", "Null", "Null", "Null"};
 int cursor = 0;
 string autonToRun = "";
+string lastSoundPlayed[5] = {"Off", "Null", "Null", "Null", "Null"};
+int click = 0;
+
 void LCDControl(int buttons, int wheelCursor, int wheelButton)
 {
 	clearLCDLine(0);
@@ -298,6 +301,12 @@ void LCDControl(int buttons, int wheelCursor, int wheelButton)
 			context[1] = "Auton";
 			context[2] = "Null";
 			context[3] = "Null";
+			autonToRun = "";
+			lastSoundPlayed[1] = "Null";
+			lastSoundPlayed[2] = "Null";
+			lastSoundPlayed[3] = "Null";
+			lastSoundPlayed[4] = "Null";
+			click = 0;
 		}
 	}
 	else if(buttons == 2) //Center Button
@@ -338,7 +347,7 @@ void LCDControl(int buttons, int wheelCursor, int wheelButton)
 			context[2] = "Red Close";
 			context[3] = "Null";
 		}
-		else if (cursor < 3071)
+		else if (cursor < 3072)
 		{
 			context[2] = "Blue Far";
 			context[3] = "Null";
@@ -348,6 +357,7 @@ void LCDControl(int buttons, int wheelCursor, int wheelButton)
 			context[2] = "Blue Close";
 			context[3] = "Null";
 		}
+		wheelButton = 0;
 	}
 	if(context[2] == "Red Far" && context[3] == "Null" && wheelButton == 1)
 	{
@@ -359,7 +369,7 @@ void LCDControl(int buttons, int wheelCursor, int wheelButton)
 		{
 			context[3] = "RFAuto2";
 		}
-		else if (cursor < 3071)
+		else if (cursor < 3072)
 		{
 			context[3] = "RFAuto3";
 		}
@@ -378,7 +388,7 @@ void LCDControl(int buttons, int wheelCursor, int wheelButton)
 		{
 			context[3] = "RCAuto2";
 		}
-		else if (cursor < 3071)
+		else if (cursor < 3072)
 		{
 			context[3] = "RCAuto3";
 		}
@@ -397,7 +407,7 @@ void LCDControl(int buttons, int wheelCursor, int wheelButton)
 		{
 			context[3] = "BFAuto2";
 		}
-		else if (cursor < 3071)
+		else if (cursor < 3072)
 		{
 			context[3] = "BFAuto3";
 		}
@@ -416,7 +426,7 @@ void LCDControl(int buttons, int wheelCursor, int wheelButton)
 		{
 			context[3] = "BCAuto2";
 		}
-		else if (cursor < 3071)
+		else if (cursor < 3072)
 		{
 			context[3] = "BCAuto3";
 		}
@@ -426,7 +436,12 @@ void LCDControl(int buttons, int wheelCursor, int wheelButton)
 		}
 	}
 	autonToRun = context[3];
+	if(context[3] != "Null")
+	{
+		lastSoundPlayed[4] = "Selected";
+	}
 }
+
 void LCDDisplay()
 {
 	string line0 = "";
@@ -435,11 +450,26 @@ void LCDDisplay()
 	if(context[0] == "Off")
 	{
 		bLCDBacklight = false;
+		if(lastSoundPlayed[0] != "Off")
+		{
+			playSound(soundDownwardTones);
+			lastSoundPlayed[0] = "Off";
+			lastSoundPlayed[1] = "Null";
+			lastSoundPlayed[2] = "Null";
+			lastSoundPlayed[3] = "Null";
+			lastSoundPlayed[4] = "Null";
+			click = 0;
+		}
 	}
 	else if(context[0] == "On")
 	{
 		bLCDBacklight = true;
 		line1 = "Auton  I/O  Batt";
+		if(lastSoundPlayed[0] != "On")
+		{
+			lastSoundPlayed[0] = "On";
+			playSound(soundFastUpwardTones);
+		}
 	}
 	//Check context level 1 (battery / auton)
 	if(context[1] == "Auton")
@@ -447,18 +477,38 @@ void LCDDisplay()
 		if(cursor < 1024)
 		{
 			line0 = "Red Far";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] != "RF" && lastSoundPlayed[2] == "Null" && lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[1] = "RF";
+				playSound(soundShortBlip);
+			}
 		}
 		else if (cursor < 2048)
 		{
 			line0 = "Red Close";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] != "RC" && lastSoundPlayed[2] == "Null" && lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[1] = "RC";
+				playSound(soundShortBlip);
+			}
 		}
-		else if (cursor < 3071)
+		else if (cursor < 3072)
 		{
 			line0 = "Blue Far";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] != "BF" && lastSoundPlayed[2] == "Null" && lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[1] = "BF";
+				playSound(soundShortBlip);
+			}
 		}
 		else
 		{
 			line0 = "Blue Close";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] != "BC" && lastSoundPlayed[2] == "Null" && lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[1] = "BC";
+				playSound(soundShortBlip);
+			}
 		}
 	}
 	else if(context[1] == "Battery")
@@ -470,18 +520,38 @@ void LCDDisplay()
 		if(cursor < 1024)
 		{
 			line0 = "RFAuto1";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "RF" && lastSoundPlayed[2] != "RF1" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "RF1";
+				playSound(soundShortBlip);
+			}
 		}
 		else if (cursor < 2048)
 		{
 			line0 = "RFAuto2";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "RF" && lastSoundPlayed[2] != "RF2" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "RF2";
+				playSound(soundShortBlip);
+			}
 		}
-		else if (cursor < 3071)
+		else if (cursor < 3072)
 		{
 			line0 = "RFAuto3";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "RF" && lastSoundPlayed[2] != "RF3" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "RF3";
+				playSound(soundShortBlip);
+			}
 		}
 		else
 		{
 			line0 = "RFAuto4";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "RF" && lastSoundPlayed[2] != "RF4" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "RF4";
+				playSound(soundShortBlip);
+			}
 		}
 	}
 	else if (context[2] == "Red Close")
@@ -489,18 +559,38 @@ void LCDDisplay()
 		if(cursor < 1024)
 		{
 			line0 = "RCAuto1";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "RC" && lastSoundPlayed[2] != "RC1" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "RC1";
+				playSound(soundShortBlip);
+			}
 		}
 		else if (cursor < 2048)
 		{
 			line0 = "RCAuto2";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "RC" && lastSoundPlayed[2] != "RC2" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "RC2";
+				playSound(soundShortBlip);
+			}
 		}
-		else if (cursor < 3071)
+		else if (cursor < 3072)
 		{
 			line0 = "RCAuto3";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "RC" && lastSoundPlayed[2] != "RC3" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "RC3";
+				playSound(soundShortBlip);
+			}
 		}
 		else
 		{
 			line0 = "RCAuto4";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "RC" && lastSoundPlayed[2] != "RC4" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "RC4";
+				playSound(soundShortBlip);
+			}
 		}
 	}
 	else if (context[2] == "Blue Far")
@@ -508,18 +598,38 @@ void LCDDisplay()
 		if(cursor < 1024)
 		{
 			line0 = "BFAuto1";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "BF" && lastSoundPlayed[2] != "BF1" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "BF1";
+				playSound(soundShortBlip);
+			}
 		}
 		else if (cursor < 2048)
 		{
 			line0 = "BFAuto2";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "BF" && lastSoundPlayed[2] != "BF2" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "BF2";
+				playSound(soundShortBlip);
+			}
 		}
-		else if (cursor < 3071)
+		else if (cursor < 3072)
 		{
 			line0 = "BFAuto3";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "BF" && lastSoundPlayed[2] != "BF3" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "BF3";
+				playSound(soundShortBlip);
+			}
 		}
 		else
 		{
 			line0 = "BFAuto4";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "BF" && lastSoundPlayed[2] != "BF4" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "BF4";
+				playSound(soundShortBlip);
+			}
 		}
 	}
 	else if (context[2] == "Blue Close")
@@ -527,20 +637,62 @@ void LCDDisplay()
 		if(cursor < 1024)
 		{
 			line0 = "BCAuto1";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "BC" && lastSoundPlayed[2] != "BC1" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "BC1";
+				playSound(soundShortBlip);
+			}
 		}
 		else if (cursor < 2048)
 		{
 			line0 = "BCAuto2";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "BC" && lastSoundPlayed[2] != "BC2" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "BC2";
+				playSound(soundShortBlip);
+			}
 		}
-		else if (cursor < 3071)
+		else if (cursor < 3072)
 		{
 			line0 = "BCAuto3";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "BC" && lastSoundPlayed[2] != "BC3" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "BC3";
+				playSound(soundShortBlip);
+			}
 		}
 		else
 		{
 			line0 = "BCAuto4";
+			if(lastSoundPlayed[0] == "On" && lastSoundPlayed[1] == "BC" && lastSoundPlayed[2] != "BC4" &&  lastSoundPlayed[3] == "Null" && lastSoundPlayed[4] == "Null")
+			{
+				lastSoundPlayed[2] = "BC4";
+				playSound(soundShortBlip);
+			}
+		}
+	}
+	if (context[3] != "Null")
+	{
+		int leftbuffer = (16 - strlen(line0)) / 2;
+		int rightbuffer = round((16 - strlen(line0)) / 2.0);
+		line0 = "";
+		for(int i = 0; i < leftbuffer; i++)
+		{
+			line0 += "$";
+		}
+		line0 += context[3];
+		for(int i = 0; i < rightbuffer; i++)
+		{
+			line0 += "$";
 		}
 	}
 	displayLCDCenteredString(0, line0);
 	displayLCDCenteredString(1, line1);
+	if(SensorValue[CursorClick] == 1 && lastSoundPlayed[0] == "On" && click < 2)
+	{
+		playSound(soundBeepBeep);
+		click++;
+	}
+	waitUntil(nLCDButtons == 0);
+	waitUntil(SensorValue[CursorClick] == 0);
 }
