@@ -1,0 +1,136 @@
+--BEGIN FILE--
+--ROBOT SKETCH DETAILS--
+--NEXT ROBOT SKETCH--
+5327B - Worlds Sketch
+1.5
+1.5
+Front
+Back
+2
+None
+0
+None
+--ROBOT DETAILS--
+--NEXT ROBOT--
+5327B
+5327B - Worlds Sketch
+Far Blue
+--FRAME DETAILS--
+--NEXT FRAME--
+Start
+[5327B]
+[0]
+[1]
+[225]
+[[]]
+ ["None"]
+ ["Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing"]
+0
+0
+32
+32
+--NEXT FRAME--
+Drive to Goal
+[5327B]
+[3.9244426355853355]
+[4.924442635585334]
+[225]
+[[]]
+ ["None"]
+ ["Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing"]
+0
+0
+32
+32
+--NEXT FRAME--
+Align with Wall
+[5327B]
+[3.9244426355853355]
+[5.15]
+[270]
+[[]]
+ ["None"]
+ ["Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing"]
+0
+0
+32
+32
+--NEXT FRAME--
+Grab Pyramid along Wall
+[5327B]
+[2.5744426355853363]
+[5.15]
+[270]
+[[55 55 55 25]]
+ ["None"]
+ ["Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Intaken" "Standing" "Standing"]
+0
+0
+32
+32
+--NEXT FRAME--
+Align with Other Pyramids
+[5327B]
+[3.174442635585336]
+[5]
+[225]
+[[55 55 55 25]]
+ ["None"]
+ ["Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Standing" "Intaken" "Standing" "Standing"]
+0
+0
+32
+32
+--NEXT FRAME--
+Begin Outtake and Knock Down Pyramid
+[5327B]
+[2.5380465325174444]
+[4.3636038969321085]
+[225]
+[[]]
+ ["None"]
+ ["Standing" "Standing" "Standing" "Standing" "Standing" "Intaken" "Standing" "Intaken" "Standing" "Standing"]
+0
+0
+32
+32
+--NEXT FRAME--
+Another Pyramid
+[5327B]
+[1.159188309203678]
+[3.1968777079743074]
+[225]
+[[]]
+ ["None"]
+ ["Standing" "Standing" "Standing" "Intaken" "Standing" "Intaken" "Standing" "Intaken" "Standing" "Standing"]
+0
+0
+32
+32
+--NEXT FRAME--
+Last Pyramid
+[5327B]
+[-0.15]
+[2.493058143488938]
+[195]
+[[]]
+ ["None"]
+ ["Standing" "Standing" "Standing" "Intaken" "Standing" "Intaken" "Standing" "Intaken" "Standing" "Intaken"]
+0
+0
+32
+32
+--NEXT FRAME--
+End at Corner
+[5327B]
+[0.13977774788672057]
+[0.1360133036297961]
+[195]
+[[]]
+ ["None"]
+ ["Standing" "Standing" "Standing" "Intaken" "Standing" "Intaken" "Standing" "Intaken" "Standing" "Intaken"]
+0
+0
+32
+32
+--END FILE--

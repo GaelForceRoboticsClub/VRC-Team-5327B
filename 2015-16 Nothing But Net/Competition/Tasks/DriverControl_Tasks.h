@@ -25,7 +25,7 @@ task Intaking()
 {
 	while(true)
 	{
-		IntakeControl(inBtn - outBtn, autoIntakeToggle);
+		IntakeControl(intakeBtn - outtakeBtn, autoIntakeToggle);
 		if(autoIntakeToggleBtn == 1)
 		{
 			waitUntil(autoIntakeToggleBtn == 0);
@@ -54,6 +54,11 @@ task Launch()
 	while(true)
 	{
 		LauncherControl(launchFastBtn, 0, launchSlowBtn == 1);
+		if(launchHoldToggleBtn == 1)
+		{
+			launchHoldToggle = !launchHoldToggle;
+			waitUntil(launchHoldToggleBtn == 0);
+		}
 		EndTimeSlice();
 	}
 }
@@ -322,5 +327,11 @@ Task that governs all code related to LCD
 */
 task LCD()
 {
-	//TBD
+	while(true)
+	{
+		LCDControl(nLCDButtons, SensorValue[CursorPot], SensorValue[CursorClick]);
+		LCDDisplay();
+		wait1Msec(nLCDRefreshRate);
+		EndTimeSlice();
+	}
 }

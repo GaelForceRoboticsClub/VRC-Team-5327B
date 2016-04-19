@@ -8,7 +8,7 @@ Function governing the movement of the base during Autonomous. Takes 4 parameter
 @rot_comp : How much we want to rotate the robot CW/CCW
 @duration : How long to drive
 */
-void ABase(int X_comp, int Y_comp, int rot_comp, int duration=10)
+void ABase(int X_comp, int Y_comp, int rot_comp, int duration=1)
 {
 	//Waits until previous duration is 0 (command finished), then adds a new command to the drive array
 	waitUntil(Auton_Drive_Array[3] == 0);
@@ -25,7 +25,7 @@ Function governing the launcher during Autonomous. Takes 3 parameters:
 @duration : How long we wish to maintain this motion
 @slow : Whether we should shoot at a slow speed
 */
-void ALaunch(int direction, int duration = 500, bool slow)
+void ALaunch(int direction, int duration = 500, bool slow = false)
 {
 	waitUntil(Auton_Launch_Array[2] == 0);
 	Auton_Launch_Array[0] = direction;

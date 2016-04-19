@@ -14,6 +14,8 @@ globals [
   currFrame
   lastTimeFramed
   pyramids_array
+  TURN_SCALE
+  DRIVE_SCALE
   ]
 breed [tiles tile]
 breed [tape tapesing]
@@ -109,12 +111,14 @@ to reset-field
   set fireCheck 0
   set BlueScore 0
   set RedScore 0
+  set TURN_SCALE 0.05
+  set DRIVE_SCALE 1
   clear-output
   ask balls with [shape = "nbnpyramid"]
   [
-    set size 1.5
+    set size 10
     set status "Standing"
-    if not ((abs(xcor - 2.5) > 2.5) or abs(ycor - 2.5) > 2.5)
+    if not (xcor < 5 or xcor > 25 or ycor < 4 or ycor > 26)
     [
       set heading random 360
     ]
@@ -136,84 +140,86 @@ to hardreset
   create-tiles 1 [
     set shape "tile"
     set color blue
-    set size 10
-    setxy 0 1
+    set size 50
+    setxy 2 7
   ]
   create-tiles 1 [
     set shape "tile"
     set color blue
-    set size 10
-    setxy 1 0
+    set size 50
+    setxy 7 2
   ]
   create-tiles 1 [
     set shape "tile"
     set color red
-    set size 10
-    setxy 4 0
+    set size 50
+    setxy 22 2
   ]
   create-tiles 1 [
     set shape "tile"
     set color red
-    set size 10
-    setxy 5 1
+    set size 50
+    setxy 27 7
   ]
   create-tiles 1 [
     set shape "tri"
     set color blue
-    set size 10
-    setxy 5 5
+    set size 50
+    setxy 27 27
     set heading 180
   ]
   create-tiles 1 [
     set shape "tri"
     set color red
-    set size 10
-    setxy 0 5
+    set size 50
+    setxy 2 27
     set heading 90
   ]
   create-tape 1 [
     set shape "circle"
-    set size 0.1
+    set size 0.5
     set color white
-    setxy 5.55 1.45
-    set heading towardsxy 1.5 5.5
-    while[xcor < 1.44]
+    setxy 0 9.25
+    hatch 1
+    set heading towardsxy 9.25 0
+    while[xcor < 9.25]
     [
-      fd 0.01
+      fd 0.05
       hatch 1
     ]
     set heading 0
-    while[ycor < 1.44]
+    while[ycor < 9.25]
     [
-      fd 0.01
+      fd 0.05
       hatch 1
     ]
     set heading 270
-    while[xcor > -0.45]
+    while[xcor > 0]
     [
-      fd 0.01
+      fd 0.05
       hatch 1
     ]
   ]
   create-tape 1 [
     set shape "circle"
-    set size 0.1
+    set size 0.5
     set color white
-    setxy 5.45 1.45
-    set heading towardsxy 3.5 5.5
-    while[xcor > 3.55]
+    setxy 29 9.25
+    hatch 1
+    set heading towardsxy 19.75 0
+    while[xcor > 19.75]
     [
       fd 0.01
       hatch 1
     ]
     set heading 0
-    while[ycor < 1.44]
+    while[ycor < 9.25]
     [
       fd 0.01
       hatch 1
     ]
     set heading 90
-    while[xcor < 5.45]
+    while[xcor < 29]
     [
       fd 0.01
       hatch 1
@@ -221,12 +227,12 @@ to hardreset
   ]
   create-tape 1 [
     set shape "circle"
-    set size 0.1
+    set size 0.5
     set color white
-    setxy 1.5 1.5
+    setxy 9.25 9.25
     hatch 1
-    set heading towardsxy 4 4
-    while[xcor < 5]
+    set heading towardsxy 24.75 24.75
+    while[xcor < 24.75]
     [
       fd 0.01
       hatch 1
@@ -234,12 +240,12 @@ to hardreset
   ]
   create-tape 1 [
     set shape "circle"
-    set size 0.1
+    set size 0.5
     set color white
-    setxy 3.5 1.5
+    setxy 19.75 9.25
     hatch 1
-    set heading towardsxy 1 4
-    while[xcor > 0]
+    set heading towardsxy 4.25 24.75
+    while[xcor > 4.25]
     [
       fd 0.01
       hatch 1
@@ -247,66 +253,66 @@ to hardreset
   ]
   create-balls 1 [
     set shape "nbnpyramid"
-    set size 1.5
-    setxy 3.5 1.5
+    set size 10
+    setxy 19.75 9.25
     set pyramidID "Pyr0"
   ]
   create-balls 1 [
     set shape "nbnpyramid"
-    set size 1.5
-    setxy 1.5 1.5
+    set size 10
+    setxy 9.25 9.25
     set pyramidID "Pyr1"
     ]
   create-balls 1 [
     set shape "nbnpyramid"
-    set size 1.5
-    setxy 3.5 3.5
+    set size 10
+    setxy 9.25 19.75
     set pyramidID "Pyr2"
   ]
   create-balls 1 [
     set shape "nbnpyramid"
-    set size 1.5
-    setxy 1.5 3.5
+    set size 10
+    setxy 19.75 19.75
     set pyramidID "Pyr3"
   ]
   create-balls 1 [
     set shape "nbnpyramid"
-    set size 1.5
-    setxy 2.5 0.5
+    set size 10
+    setxy 14.5 0.5
+    set heading 180
     set pyramidID "Pyr4"
   ]
   create-balls 1 [
     set shape "nbnpyramid"
-    set size 1.5
-    setxy 2.5 4.5
+    set size 10
+    setxy 14.5 5
     set pyramidID "Pyr5"
   ]
   create-balls 1 [
     set shape "nbnpyramid"
-    set size 1.5
-    setxy 2.5 5.65
-    set heading 180
+    set size 10
+    setxy 14.5 24
     set pyramidID "Pyr6"
   ]
   create-balls 1 [
     set shape "nbnpyramid"
-    set size 1.5
-    setxy 2.5 5.35
+    set size 10
+    setxy 14.5 28.5
     set heading 0
     set pyramidID "Pyr7"
   ]
   create-balls 1 [
     set shape "nbnpyramid"
-    set size 1.5
-    setxy 5.35 2.5
-    set heading 90
+    set size 10
+    setxy 0.5 14.5
+    set heading 270
     set pyramidID "Pyr8"
   ]
   create-balls 1 [
     set shape "nbnpyramid"
-    set size 1.5
-    setxy 5.65 2.5
-    set heading 270
+    set size 10
+    setxy 28.5 14.5
+    set heading 90
     set pyramidID "Pyr9"
   ]
 end
@@ -316,8 +322,8 @@ to up
   [
     ask robots with [startingtile = robotbeingdriven and elevation = "None"] [
       let checkID robotsketchID
-      set xcor (xcor + (sin(heading) * 0.1 * first([fdbkdrive_speed] of robotsketches with [ID = checkID]))) 
-      set ycor (ycor + (cos(heading) * 0.1 * first([fdbkdrive_speed] of robotsketches with [ID = checkID])))    
+      set xcor (xcor + (sin(heading) * 0.5 * first([fdbkdrive_speed] of robotsketches with [ID = checkID]))) 
+      set ycor (ycor + (cos(heading) * 0.5 * first([fdbkdrive_speed] of robotsketches with [ID = checkID])))    
     ]
     rebuildbots
   ]
@@ -328,8 +334,8 @@ to down
   [
     ask robots with [startingtile = robotbeingdriven and elevation = "None"] [
       let checkID robotsketchID
-      set xcor (xcor - (sin(heading) * 0.1 * first([fdbkdrive_speed] of robotsketches with [ID = checkID]))) 
-      set ycor (ycor - (cos(heading) * 0.1 * first([fdbkdrive_speed] of robotsketches with [ID = checkID])))
+      set xcor (xcor - (sin(heading) * 0.5 * first([fdbkdrive_speed] of robotsketches with [ID = checkID]))) 
+      set ycor (ycor - (cos(heading) * 0.5 * first([fdbkdrive_speed] of robotsketches with [ID = checkID])))
     ]
     rebuildbots
   ]
@@ -362,8 +368,8 @@ to strafeR
   [
     ask robots with [startingtile = robotbeingdriven and elevation = "None"]  [
       let checkID robotsketchID
-      set xcor (xcor + (sin(heading + 90) * 0.1 * first([sidedrive_speed] of robotsketches with [ID = checkID]))) 
-      set ycor (ycor + (cos(heading + 90) * 0.1 * first([sidedrive_speed] of robotsketches with [ID = checkID])))
+      set xcor (xcor + (sin(heading + 90) * 0.5 * first([sidedrive_speed] of robotsketches with [ID = checkID]))) 
+      set ycor (ycor + (cos(heading + 90) * 0.5 * first([sidedrive_speed] of robotsketches with [ID = checkID])))
     ]
     rebuildbots
   ]
@@ -374,8 +380,8 @@ to strafeL
   [
     ask robots with [startingtile = robotbeingdriven and elevation = "None"]  [
       let checkID robotsketchID
-      set xcor (xcor - (sin(heading + 90) * 0.1 * first([sidedrive_speed] of robotsketches with [ID = checkID]))) 
-      set ycor (ycor - (cos(heading + 90) * 0.1 * first([sidedrive_speed] of robotsketches with [ID = checkID])))
+      set xcor (xcor - (sin(heading + 90) * 0.5 * first([sidedrive_speed] of robotsketches with [ID = checkID]))) 
+      set ycor (ycor - (cos(heading + 90) * 0.5 * first([sidedrive_speed] of robotsketches with [ID = checkID])))
     ]
     rebuildbots
   ]
@@ -401,18 +407,18 @@ to crtbls
   create-balls 1 [
           set shape "nbnball"
           set color last first([capacity] of robots with [robotID = fireCheck])
-          set size 1.5
+          set size 7.5
           setxy first([xcor] of robots with [robotID = fireCheck]) first([ycor] of robots with [robotID = fireCheck])
           set heading first([heading] of robots with [robotID = fireCheck])
           set alliance first([alliance] of robots with [robotID = fireCheck]) 
           ifelse(alliance = "Blue")
           [
-            set targetX 5
-            set targetY 5
+            set targetX 27.5
+            set targetY 27.5
           ]
           [
-            set targetX 0
-            set targetY 5
+            set targetX 1.5
+            set targetY 27.5
           ]                 
         ]
   ask robots with [robotID = fireCheck]
@@ -426,30 +432,32 @@ end
 to go
   if running?
   [
-    crtbls
-    ask robots [
-      if(xcor < -0.15)
+    ask robots
+    [
+      if (xcor < 1)
       [
-        set xcor -0.15
+        set xcor 1
       ]
-      if(ycor < -0.15)
+      if (ycor < 1)
       [
-        set ycor -0.15
+        set ycor 1
       ]
-      if(xcor > 5.15)
+      if (xcor > 28)
       [
-        set xcor 5.15
+        set xcor 28
       ]
-      if(ycor > 5.15)
+      if (ycor > 28)
       [
-        set ycor 5.15
+        set ycor 28
       ]
+      
     ]
+    crtbls
     rebuildbots
     ask balls with [shape = "nbnpyramid"][
       let closestRoller min-one-of rollers [distancexy [xcor] of myself [ycor] of myself]
       let checkID [rollerID] of closestRoller
-      if(distance closestRoller < 0.25 and length first([capacity] of robots with [robotID = checkID]) = 0 and status = "Standing")
+      if(distance closestRoller < 1.25 and length first([capacity] of robots with [robotID = checkID]) = 0 and status = "Standing")
       [
         ask robots with [robotID = checkID]
         [
@@ -460,24 +468,24 @@ to go
       ]
     ]
     ask balls with [shape = "nbnball"] [
-      ifelse(distancexy 5 5 > 0.5)
+      ifelse(distancexy 27.5 27.5 > 0.5)
       [
-        ifelse(distancexy 0 5 > 0.5)
+        ifelse(distancexy 1.5 27.5 > 0.5)
         [
-          fd 0.1
-          if(xcor < -0.15)
+          fd 0.25
+          if(xcor < 0.5)
           [
             die
           ]
-          if(ycor < -0.15)
+          if(ycor < 0.5)
           [
             die
           ]
-          if(xcor > 5.15)
+          if(xcor > 28.5)
           [
             die
           ]
-          if(ycor > 5.15)
+          if(ycor > 28.5)
           [
             die
           ]
@@ -756,7 +764,7 @@ end
 to elevate
   ask robots with [startingTile = robotbeingdriven]
   [
-    ifelse xcor >= -0.12 and xcor <= 1.2 and ycor >= -0.12 and ycor <= 1.2 and running? and time >= 90 and elevation = "None"
+    ifelse xcor <= 1.2 and ycor >= -0.12 and running? and time >= 90 and elevation = "None"
     [
       if (distance (max-one-of robots with [alliance = [alliance] of myself][distancexy xcor ycor]) < 1)
       [
@@ -873,23 +881,23 @@ to resetbots
     set heading 0
     ifelse(startingTile = "Far Blue")
     [
-      setxy 0 1
+      setxy 2 7
       set alliance "Blue"
     ]
     [
       ifelse(startingTile = "Close Blue")
       [
-        setxy 1 0
+        setxy 7 2
         set alliance "Blue"
       ]
       [
         ifelse(startingTile = "Far Red")
         [
-          setxy 5 1
+          setxy 27 7
           set alliance "Red"
         ]
         [
-          setxy 4 0
+          setxy 22 2
           set alliance "Red"
         ]
       ]
@@ -902,25 +910,25 @@ to rebuildbots
   ask rollers [
     let checkID rollerID
     set heading first([heading] of robots with [robotID = checkID])
-    set size 2
+    set size 10
     setxy first([xcor] of robots with [robotID = checkID]) first([ycor] of robots with[robotID = checkID])
   ]
   ask baseDrives [
     let checkID baseID
     set heading first([heading] of robots with [robotID = checkID])
-    set size 2
+    set size 10
     setxy first([xcor] of robots with [robotID = checkID]) first([ycor] of robots with[robotID = checkID])
   ]
   ask primary-launchers [
     let checkID plaunchID
     set heading first([heading] of robots with [robotID = checkID])
-    set size 2
+    set size 10
     setxy first([xcor] of robots with [robotID = checkID]) first([ycor] of robots with[robotID = checkID])
   ]
   ask secondary-launchers [
     let checkID slaunchID
     set heading first([heading] of robots with [robotID = checkID])
-    set size 2
+    set size 10
     setxy first([xcor] of robots with [robotID = checkID]) first([ycor] of robots with[robotID = checkID])
   ]
 end
@@ -929,7 +937,7 @@ to addrobottofield
   create-robots 1 [
     set shape "square"
     set heading 0
-        set size 2
+    set size 10
     let desiredrobotID user-input "Enter a name for this robot: (MUST be unique)"
     ask robots with [robotID = desiredrobotID] [die]
     set robot_array remove desiredrobotID robot_array
@@ -941,23 +949,23 @@ to addrobottofield
     set capacity []
     ifelse(startingTile = "Far Blue")
     [
-      setxy 0 1
+      setxy 2 7
       set alliance "Blue"
     ]
     [
       ifelse(startingTile = "Close Blue")
       [
-        setxy 1 0
+        setxy 7 2
         set alliance "Blue"
       ]
       [
         ifelse(startingTile = "Far Red")
         [
-          setxy 5 1
+          setxy 27 7
           set alliance "Red"
         ]
         [
-          setxy 4 0
+          setxy 22 2
           set alliance "Red"
         ]
       ]
@@ -969,7 +977,7 @@ to addrobottofield
     set rollerID last robot_array
     set shape (word "roller" first([intake_sides] of robotsketches with [ID = first ([robotSketchID] of robots with [robotID = last robot_array])]))
     set heading 0
-    set size 2
+    set size 10
     setxy first([xcor] of robots with [robotID = last robot_array]) first([ycor] of robots with[robotID = last robot_array])
   ]
   create-baseDrives 1 [
@@ -988,21 +996,21 @@ to addrobottofield
       ]
     ]
     set heading 0
-    set size 2
+    set size 10
     setxy first([xcor] of robots with [robotID = last robot_array]) first([ycor] of robots with[robotID = last robot_array])
   ]
   create-primary-launchers 1 [
     set plaunchID last robot_array
     set shape (word "plaunch" first([primary_launcher_sides] of robotsketches with [ID = first ([robotSketchID] of robots with [robotID = last robot_array])]))
     set heading 0
-    set size 2
+    set size 10
     setxy first([xcor] of robots with [robotID = last robot_array]) first([ycor] of robots with[robotID = last robot_array])
   ]
   create-secondary-launchers 1 [
     set slaunchID last robot_array
     set shape (word "slaunch" first([secondary_launcher_sides] of robotsketches with [ID = first ([robotSketchID] of robots with [robotID = last robot_array])]))
     set heading 0
-    set size 2
+    set size 10
     setxy first([xcor] of robots with [robotID = last robot_array]) first([ycor] of robots with[robotID = last robot_array])
   ]
   user-message "Robot Added!"
@@ -1080,11 +1088,10 @@ to add-frame
 end
 
 to dispFrame [frameBeingDisp]
-  clear-drawing
   let actualFrame one-of frames with [frameID = frameBeingDisp]
   ask robots [
     pen-down
-    set pen-size 2
+    set pen-size 10
     let indexInArray position robotID robot_array
     setxy item indexInArray [robotXs] of actualFrame item indexInArray [robotYs] of actualFrame
     set heading item indexinarray [robotHs] of actualFrame
@@ -1099,7 +1106,7 @@ to dispFrame [frameBeingDisp]
         ifelse (item counter ([pyramids] of actualFrame)) = "Standing"
         [
           set status "Standing"
-          set size 1.5
+          set size 10
         ]
         [
           set status "Intaken"
@@ -1242,7 +1249,7 @@ to importFilm
       create-robots 1 [
         set shape "square"
         set heading 0
-        set size 2
+        set size 10
         set robotID item (current-index + 1) file-info
         set robot_array lput robotID robot_array
         set robotsketchID item (current-index + 2) file-info
@@ -1278,7 +1285,7 @@ to importFilm
         set rollerID last robot_array
         set shape (word "roller" first([intake_sides] of robotsketches with [ID = first ([robotSketchID] of robots with [robotID = last robot_array])]))
         set heading 0
-        set size 2
+        set size 10
         setxy first([xcor] of robots with [robotID = last robot_array]) first([ycor] of robots with[robotID = last robot_array])
       ]
       create-baseDrives 1 [
@@ -1297,21 +1304,21 @@ to importFilm
           ]
         ]
         set heading 0
-        set size 2
+        set size 10
         setxy first([xcor] of robots with [robotID = last robot_array]) first([ycor] of robots with[robotID = last robot_array])
       ]
       create-primary-launchers 1 [
         set plaunchID last robot_array
         set shape (word "plaunch" first([primary_launcher_sides] of robotsketches with [ID = first ([robotSketchID] of robots with [robotID = last robot_array])]))
         set heading 0
-        set size 2
+        set size 10
         setxy first([xcor] of robots with [robotID = last robot_array]) first([ycor] of robots with[robotID = last robot_array])
       ]
       create-secondary-launchers 1 [
         set slaunchID last robot_array
         set shape (word "slaunch" first([secondary_launcher_sides] of robotsketches with [ID = first ([robotSketchID] of robots with [robotID = last robot_array])]))
         set heading 0
-        set size 2
+        set size 10
         setxy first([xcor] of robots with [robotID = last robot_array]) first([ycor] of robots with[robotID = last robot_array])
       ]
       set current-index current-index + 4
@@ -1352,6 +1359,71 @@ to importFilm
   ]
   file-close-all
 end
+
+to generateCode
+  file-close-all
+  file-open user-new-file
+  let fileName user-input "Enter a name for this routine:"
+  file-print "//Automatically generated code via VRC 5327B NbN Simulation"
+  file-print (word "void " fileName "()")
+  file-print "{"
+  let currentFrameCode 1
+  let initialX 0
+  let initialY 0
+  let initialH 0
+  let endX 0
+  let endY 0
+  let endH 0
+  let desiredRobotIndex 0
+  ask robots with [startingtile = robotbeingdriven]
+  [
+    set desiredRobotIndex position robotID robot_array
+  ]
+  ask frames with [frameID = item 0 frames_array]
+    [
+      set endX item desiredRobotIndex robotXs
+      set endY item desiredRobotIndex robotYs
+      set endH item desiredRobotIndex robotHs
+    ]
+  while [currentFrameCode < length frames_array]
+  [
+    set initialX endX
+    set initialY endY
+    set initialH endH
+    ask frames with [frameID = item currentFrameCode frames_array]
+    [
+      file-print word "  //" frameID
+      set endX item desiredRobotIndex robotXs
+      set endY item desiredRobotIndex robotYs
+      set endH item desiredRobotIndex robotHs
+    ]
+    if endH != initialH
+    [
+      let turn abs(TURN_SCALE * (initialH - endH))
+      ifelse initialH < endH
+      [
+        file-print (word "  ABase(0, 0, 127, " round(turn) ");")
+      ]
+      [
+        file-print (word "  ABase(0, 0, -127, " round(turn) ");")
+      ]
+    ]
+    if endX != initialX or endY != initialY
+    [
+      let distanceToTravel sqrt((endX - initialX) ^ 2 + (endY - initialY) ^ 2)
+      let straight distanceToTravel * DRIVE_SCALE
+      let xcomp endX - initialX
+      let ycomp endY - initialY
+      let angle (atan xcomp ycomp) - initialH
+      let xpower round(127 * cos(angle))
+      let ypower round(127 * sin(angle)) 
+      file-print (word "  ABase(" xpower ", " ypower ", 0, " round(straight) ");")
+    ]
+    set currentFrameCode currentFrameCode + 1
+  ]
+  file-print "}"
+  file-close-all
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 538
@@ -1360,25 +1432,25 @@ GRAPHICS-WINDOW
 551
 -1
 -1
-85.0
+17.0
 1
 10
 1
 1
 1
 0
-1
-1
+0
+0
 1
 0
-5
+29
 0
-5
+29
 0
 0
 1
 ticks
-30.0
+10.0
 
 BUTTON
 301
@@ -1933,10 +2005,10 @@ NIL
 1
 
 MONITOR
-1343
-292
-1437
-337
+1295
+404
+1389
+449
 Current Frame
 currFrame
 17
@@ -1978,6 +2050,23 @@ BUTTON
 554
 Import Match Film
 importFilm
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+1067
+565
+1288
+598
+Generate RobotC Code
+generateCode
 NIL
 1
 T
