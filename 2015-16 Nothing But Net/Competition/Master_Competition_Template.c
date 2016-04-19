@@ -1,11 +1,11 @@
 #pragma config(Sensor, in1,    BallSensorRamp, sensorLineFollower)
 #pragma config(Sensor, in2,    BallSensorElevator, sensorLineFollower)
 #pragma config(Sensor, in3,    BallSensorLauncher, sensorLineFollower)
-#pragma config(Sensor, in4,    CursorPot,      sensorPotentiometer)
+#pragma config(Sensor, in8,    CursorPot,      sensorPotentiometer)
 #pragma config(Sensor, in5,    AnglePot,       sensorPotentiometer)
 #pragma config(Sensor, in6,    LLine,          sensorLineFollower)
 #pragma config(Sensor, in7,    RLine,          sensorLineFollower)
-#pragma config(Sensor, in8,    Gyro,           sensorGyro)
+#pragma config(Sensor, in4,    Gyro,           sensorGyro)
 #pragma config(Sensor, dgtl1,  LauncherSet,    sensorTouch)
 #pragma config(Sensor, dgtl2,  DirectionLED,   sensorLEDtoVCC)
 #pragma config(Sensor, dgtl3,  DirectionLED2,  sensorLEDtoVCC)
@@ -126,16 +126,55 @@ int Auton_AutoLoad_Array[1]; //Contains: Direction
 //Include this file last, since it makes use of the pew reference defined above
 #include "Etc/Routines.h" //All autonomous and skills routines
 
+void resetGyro()
+{
+	SensorType[Gyro] = sensorNone; //Reset gyroscope at beginning of program
+	SensorType[Gyro] = sensorGyro;
+	wait1Msec(250);
+}
+
 //Predefined construct
 void pre_auton()
 {
 	bStopTasksBetweenModes = true;
-	SensorType[in8] = sensorNone; //Reset gyroscope at beginning of program
-	SensorType[in8] = sensorGyro;
+	resetGyro();
 }
-
+//Automatically generated code via VRC 5327B NbN Simulation
+void CloseRedAuton1()
+{
+  //Turn to face goal
+	resetGyro();
+	while(SensorValue[Gyro] <= 320)
+	{
+		ABase(0, 0, -35);
+	}
+	int i = 0;
+	while(i < 3)
+	{
+		while(SensorValue[LauncherSet] == 0)
+		{
+			ALaunch(1, 50);
+		}
+		wait1Msec(100);
+		while(SensorValue[LauncherSet] == 1)
+		{
+			ALaunch(1, 50);
+		}
+		wait1Msec(100);
+		ALaunch(1, 50);
+		ALaunch(0, 50);
+		wait1Msec(250);
+		i++;
+	}
+	ALaunch(0);
+	while(SensorValue[Gyro] <= 450)
+	{
+		ABase(0, 0, -35);
+	}
+	ABase(0, -127, 0, 2500);
+}
 //Task controlling behavior during Autonomous period
-task autonomous()
+task usercontrol()
 {
 	//Start necessary Autonomous control tasks
 	startTask(Auton_Aim);
@@ -143,22 +182,18 @@ task autonomous()
 	startTask(Auton_Intaking);
 	startTask(Auton_Launch);
 	startTask(AutoLoading);
+	slaveMotor(Out2, Out1);
 
 	/*----------------------CHOOSE AUTON PROGRAM HERE---------------------*/
 	//Find the function you want to use, and type in the function call below:
 	//(Ex: redDefensiveCapture1();)
 
-	pew;
-	pew;
-	pew;
-	pew;
-	ABase(0, 127, 3000);
-
+	CloseRedAuton1();
 	/*------------------------CHOOSE AUTON PROGRAM HERE---------------------*/
 }
 
 //Task controlling behavior during Driver Control period
-task usercontrol()
+task autonomous()
 {
 	//Start necessary tasks for user control
 	startTask(Drive);
