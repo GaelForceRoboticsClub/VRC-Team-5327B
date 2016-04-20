@@ -1,12 +1,12 @@
 #pragma config(Sensor, in1,    BallSensorRamp, sensorLineFollower)
 #pragma config(Sensor, in2,    BallSensorElevator, sensorLineFollower)
 #pragma config(Sensor, in3,    BallSensorLauncher, sensorLineFollower)
-#pragma config(Sensor, in8,    CursorPot,      sensorPotentiometer)
-#pragma config(Sensor, in5,    AnglePot,       sensorPotentiometer)
+#pragma config(Sensor, in5,    CursorPot,      sensorPotentiometer)
+#pragma config(Sensor, in8,    AnglePot,       sensorPotentiometer)
 #pragma config(Sensor, in6,    LLine,          sensorLineFollower)
 #pragma config(Sensor, in7,    RLine,          sensorLineFollower)
 #pragma config(Sensor, in4,    Gyro,           sensorGyro)
-#pragma config(Sensor, dgtl1,  LauncherSet,    sensorTouch)
+#pragma config(Sensor, dgtl11,  LauncherSet,    sensorTouch)
 #pragma config(Sensor, dgtl2,  DirectionLED,   sensorLEDtoVCC)
 #pragma config(Sensor, dgtl3,  DirectionLED2,  sensorLEDtoVCC)
 #pragma config(Sensor, dgtl4,  LauncherBottomLimit, sensorTouch)
@@ -101,6 +101,7 @@ bool launchHoldToggle = true;
 bool autoIntakeToggle = false;
 bool elevatorOn = false;
 int robotDirection = 1;
+string mode = "Auton";
 
 int Auton_Drive_Array[4]; //Arrays that are used during autonomous in a manner similar to the motor array, contains: X, Y, Rot, and Duration
 int Auton_Launch_Array[3]; //Contains: Direction, Duration, and Slow
@@ -118,10 +119,10 @@ int Auton_AutoLoad_Array[1]; //Contains: Direction
 
 #include "Tasks/General_Tasks.h" //General tasks run throughout match/competition
 #include "Tasks/DriverControl_Tasks.h" //Driver Control-specific tasks
-#include "Tasks/Autonomous_Tasks.h" //Autonomous-specific tasks
+//#include "Tasks/Autonomous_Tasks.h" //Autonomous-specific tasks
 
 //Define a handy (and fun to use) shortcut for launching, so that we can write "pew pew pew pew" to shoot
-#define pew LauncherControl(1, 500)
+#define pew launch(1)
 
 //Include this file last, since it makes use of the pew reference defined above
 #include "Etc/Routines.h" //All autonomous and skills routines
@@ -133,68 +134,18 @@ void resetGyro()
 	wait1Msec(250);
 }
 
+
 //Predefined construct
 void pre_auton()
 {
 	bStopTasksBetweenModes = true;
 	resetGyro();
 }
-//Automatically generated code via VRC 5327B NbN Simulation
-void CloseRedAuton1()
-{
-  //Turn to face goal
-	resetGyro();
-	while(SensorValue[Gyro] <= 320)
-	{
-		ABase(0, 0, -35);
-	}
-	int i = 0;
-	while(i < 3)
-	{
-		while(SensorValue[LauncherSet] == 0)
-		{
-			ALaunch(1, 50);
-		}
-		wait1Msec(100);
-		while(SensorValue[LauncherSet] == 1)
-		{
-			ALaunch(1, 50);
-		}
-		wait1Msec(100);
-		ALaunch(1, 50);
-		ALaunch(0, 50);
-		wait1Msec(250);
-		i++;
-	}
-	ALaunch(0);
-	while(SensorValue[Gyro] <= 450)
-	{
-		ABase(0, 0, -35);
-	}
-	ABase(0, -127, 0, 2500);
-}
+
 //Task controlling behavior during Autonomous period
 task usercontrol()
 {
-	//Start necessary Autonomous control tasks
-	startTask(Auton_Aim);
-	startTask(Auton_Drive);
-	startTask(Auton_Intaking);
-	startTask(Auton_Launch);
-	startTask(AutoLoading);
-	slaveMotor(Out2, Out1);
-
-	/*----------------------CHOOSE AUTON PROGRAM HERE---------------------*/
-	//Find the function you want to use, and type in the function call below:
-	//(Ex: redDefensiveCapture1();)
-
-	CloseRedAuton1();
-	/*------------------------CHOOSE AUTON PROGRAM HERE---------------------*/
-}
-
-//Task controlling behavior during Driver Control period
-task autonomous()
-{
+	mode = "Driver";
 	//Start necessary tasks for user control
 	startTask(Drive);
 	startTask(Intaking);
@@ -210,4 +161,15 @@ task autonomous()
 	{
 		EndTimeSlice();
 	}
+}
+
+//Task controlling behavior during Driver Control period
+task autonomous()
+{
+	mode = "Auton";
+	motor[Intake] = 127;
+	while(true)
+	{
+	}
+	//mainAuton(0);//(Auton ID number) - Should be a variable output from LCD
 }

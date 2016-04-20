@@ -53,7 +53,7 @@ task Launch()
 {
 	while(true)
 	{
-		LauncherControl(launchFastBtn, 0, launchSlowBtn == 1);
+		DLaunch(launchFastBtn);
 		if(launchHoldToggleBtn == 1)
 		{
 			launchHoldToggle = !launchHoldToggle;
@@ -104,7 +104,7 @@ task EmergencyOverride()
 			emergenStop = true;
 			stopAlways();
 			AngleControl(0);
-			LauncherControl(0);
+			launch(0);
 			IntakeControl(0);
 			BaseControl(0, 0, 0);
 			for(int i = 1; i <= 10; i++) //Reset all motors in motor array to 0
