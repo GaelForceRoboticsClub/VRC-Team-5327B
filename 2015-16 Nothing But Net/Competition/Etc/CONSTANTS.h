@@ -12,9 +12,10 @@ const int LAUNCHER_SLOW_SPEED = 80; //How fast the launcher is adjusted on Slow 
 const int LAUNCHER_HOLD = 15; //How fast to move backwards so as to hold the launcher from firing
 
 //Intake Constants
-const int BALL_SENSED_LAUNCHER = 2800;
-const int BALL_SENSED_ELEVATOR = 0;
-const int BALL_SENSED_RAMP = 2700;
+const int BALL_SENSED_LAUNCHER = 2700;
+const int BALL_SENSED_ELEVATOR_DRIVER = 0;
+const int BALL_SENSED_ELEVATOR_AUTON = 2750;
+const int BALL_SENSED_RAMP = 2860;
 
 //Autoloader Constants
 const int AUTOLOAD_FORWARD = 100;

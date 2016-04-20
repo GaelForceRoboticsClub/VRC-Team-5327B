@@ -25,12 +25,44 @@ void BaseControl(int X_comp, int Y_comp, int rot_comp, int slow = 0, int duratio
 
 
 /*
-Function governing the launcher firing. Takes 3 parameters:
-@direction : Direction in which to fire
-@duration : How long to fire
-@slow : Whether we should shoot slow
+Function governing that resets the launcher to the sensor. Takes no parameters.
 */
-void LauncherControl(int direction, int duration = 500, bool slow = false)
+void setLauncher()
+{
+	if(SensorValue[LauncherSet] == 1)
+	{
+		motor[Out1] = LAUNCHER_HOLD;
+	}
+	else
+	{
+		while(SensorValue[LauncherSet] == 0)
+		{
+			motor[Out1] = 127;
+		}
+		motor[Out1] = LAUNCHER_HOLD;
+	}
+}
+
+/*
+Function governing the launcher firing. Takes 2 paramters:
+@ballNumber : The number of balls to be fired
+@shotDelay : How long to wait between each shot (default 100)
+*/
+void launch(int ballNumber, int shotDelay = 100)
+{
+	while(ballNumber > 0)
+	{
+		setLauncher();
+		while(SensorValue[LauncherSet] == 1)
+		{
+			motor[Out1] = 127;
+		}
+		ballNumber--;
+		wait1Msec(shotDelay);
+	}
+}
+
+void DLaunch(int direction, bool slow = false)
 {
 	if(direction != 0)
 	{
@@ -42,7 +74,6 @@ void LauncherControl(int direction, int duration = 500, bool slow = false)
 		{
 			motor[Out1] = 127 * direction;
 		}
-		wait1Msec(duration);
 	}
 	else
 	{
@@ -363,76 +394,76 @@ void LCDControl(int buttons, int wheelCursor, int wheelButton)
 	{
 		if(cursor < 1024)
 		{
-			context[3] = "RFAuto1";
+			context[3] = 0;
 		}
 		else if (cursor < 2048)
 		{
-			context[3] = "RFAuto2";
+			context[3] = 1;
 		}
 		else if (cursor < 3072)
 		{
-			context[3] = "RFAuto3";
+			context[3] = 2;
 		}
 		else
 		{
-			context[3] = "RFAuto4";
+			context[3] = 3;
 		}
 	}
 	else if(context[2] == "Red Close" && context[3] == "Null" && wheelButton == 1)
 	{
 		if(cursor < 1024)
 		{
-			context[3] = "RCAuto1";
+			context[3] = 4;
 		}
 		else if (cursor < 2048)
 		{
-			context[3] = "RCAuto2";
+			context[3] = 5;
 		}
 		else if (cursor < 3072)
 		{
-			context[3] = "RCAuto3";
+			context[3] = 6;
 		}
 		else
 		{
-			context[3] = "RCAuto4";
+			context[3] = 7;
 		}
 	}
 	else if(context[2] == "Blue Far" && context[3] == "Null" && wheelButton == 1)
 	{
 		if(cursor < 1024)
 		{
-			context[3] = "BFAuto1";
+			context[3] = 8;
 		}
 		else if (cursor < 2048)
 		{
-			context[3] = "BFAuto2";
+			context[3] = 9;
 		}
 		else if (cursor < 3072)
 		{
-			context[3] = "BFAuto3";
+			context[3] = 10;
 		}
 		else
 		{
-			context[3] = "BFAuto4";
+			context[3] = 11;
 		}
 	}
 	else if(context[2] == "Blue Close" && context[3] == "Null" && wheelButton == 1)
 	{
 		if(cursor < 1024)
 		{
-			context[3] = "BCAuto1";
+			context[3] = 12;
 		}
 		else if (cursor < 2048)
 		{
-			context[3] = "BCAuto2";
+			context[3] = 13;
 		}
 		else if (cursor < 3072)
 		{
-			context[3] = "BCAuto3";
+			context[3] = 14;
 		}
 		else
 		{
-			context[3] = "BCAuto4";
+			context[3] = 15;
 		}
 	}
 	autonToRun = context[3];
@@ -675,12 +706,31 @@ void LCDDisplay()
 	{
 		int leftbuffer = (16 - strlen(line0)) / 2;
 		int rightbuffer = round((16 - strlen(line0)) / 2.0);
+		const string routineNames[] = {
+			"RFAuto1",
+			"RFAuto2",
+			"RFAuto3",
+			"RFAuto4",
+			"RCAuto1",
+			"RCAuto2",
+			"RCAuto3",
+			"RCAuto4",
+			"BFAuto1",
+			"BFAuto2",
+			"BFAuto3",
+			"BFAuto4",
+			"BCAuto1",
+			"BCAuto2",
+			"BCAuto3",
+			"BCAuto4"
+		};
+		string prevLine0 = routineNames[context[3]];
 		line0 = "";
 		for(int i = 0; i < leftbuffer; i++)
 		{
 			line0 += "$";
 		}
-		line0 += context[3];
+		line0 += prevLine0;
 		for(int i = 0; i < rightbuffer; i++)
 		{
 			line0 += "$";

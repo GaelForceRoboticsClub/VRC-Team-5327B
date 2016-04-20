@@ -54,13 +54,27 @@ Function that determines if there is currently a ball in the elevator. Returns 1
 */
 int ballInElevator()
 {
-	if(SensorValue[BallSensorElevator] < BALL_SENSED_ELEVATOR)
+	if(mode == "Auton")
 	{
-		return 1;
+		if(SensorValue[BallSensorElevator] < BALL_SENSED_ELEVATOR_AUTON)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
 	}
 	else
 	{
+		if(SensorValue[BallSensorElevator] < BALL_SENSED_ELEVATOR_DRIVER)
+		{
+			return 1;
+		}
+		else
+		{
 		return 0;
+		}
 	}
 }
 
