@@ -15,7 +15,6 @@
 #define LiftDown vexRT[Btn6D]
 #define LiftUpSlow vexRT[Btn5U]
 #define LiftDownSlow vexRT[Btn5D]
-#define BandsReleaseBtn 1 ? (vexRT[Btn7R] && vexRT[Btn8L]) : 0
 
 //Intake control
 #define ClawToggleBtn vexRT[Btn8U]

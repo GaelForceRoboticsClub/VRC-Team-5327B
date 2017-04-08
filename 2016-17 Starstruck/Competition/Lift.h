@@ -69,7 +69,7 @@ void driverLiftControl(float adjustDir)
 	}
 	else
 	{
-		if(SensorValue[LiftPot] > 800 && SensorValue[LiftPot] < 1300)
+/*		if(SensorValue[LiftPot] > 800 && SensorValue[LiftPot] < 1300)
 		{
 			liftSpeed(15);
 		}
@@ -78,13 +78,13 @@ void driverLiftControl(float adjustDir)
 			liftSpeed(25);
 		}
 		else if(SensorValue[LiftPot] >= 2200 && SensorValue[LiftPot] < 3000)
-		{
+		{*/
 			liftSpeed(0);
-		}
+		/*}
 		else if(SensorValue[LiftPot] >= 3000)
 		{
 			liftSpeed(-15);
-		}
+		}*/
 	}
 	//Set pdTarget for controlled movement
 	/*if(adjustDir > 0 && !liftTooHigh())
@@ -114,7 +114,6 @@ task lift()
 	while(true)
 	{
 		driverLiftControl(LiftUp - LiftDown + LiftUpSlow * 0.5 - LiftDownSlow * 0.3);
-		bandsRelease(BandsReleaseBtn);
 		EndTimeSlice();
 	}
 }
