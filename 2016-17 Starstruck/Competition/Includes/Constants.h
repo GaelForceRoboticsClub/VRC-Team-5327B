@@ -21,8 +21,14 @@ const int TS_ARRAY[128] = {
 //Slew rate transition speed
 const int SLEW_RATE_SPEED = 20;
 
+//Claw constants
+const int PD_CLOSED = 0;
+const int PD_OPEN = 0;
+const int PD_FULL_WIDTH = 0;
+const int PD_BACK = 0;
+const int SLOW_CLAW_ADJUST
+
 //Max and min lift height
 const int MAX_LIFT_HEIGHT = 5000;
 const int MIN_LIFT_HEIGHT = 840;
-
 const int LIFT_ADJUST_INCREMENT = 20;

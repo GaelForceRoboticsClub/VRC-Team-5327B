@@ -29,7 +29,7 @@ V4.3.2
 #pragma competitionControl(Competition)
 #pragma autonomousDuration(20)
 #pragma userControlDuration(120)
-#include "Vex_Competition_Includes-.h"
+#include "/includes/Vex_Competition_Includes-.h"
 //VRC Specific pragmas above
 
 #include "Joystick_Defs.h" 	//Define joystick buttons in more user-friendly terms
@@ -69,16 +69,10 @@ task autonomous()
 task usercontrol()
 {
 
-/*	waitUntil(vexRT[Btn7U] == 1);
-	startTask(autonomous);
-	waitUntil(auton_flag);
-	pdTargetSet(2000);
-	lift_hold = 5;*/
 	startTask(base);
 	startTask(intake);
 	startTask(lift);
 	startTask(sfx);
-	//startTask(pdController);
 	while(true)
 	{
 		EndTimeSlice();
