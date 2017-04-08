@@ -17,6 +17,19 @@ bool driverControllingClaw = false;
 //Stores current claw state
 int currClawState = BACK;
 
+int clawPDTarget = PD_BACK;
+
+/*
+Function that sets the PD feedback loop's target value.
+Takes the following inputs:
+- @target	: The desired target value
+Has no outputs.
+*/
+void setClawPDTarget(int target)
+{
+	clawPDTarget = target;
+}
+
 /*
 Function that translates preset states into PD target for the claw.
 Takes the following inputs:
@@ -93,21 +106,6 @@ task intake()
 		ClawToggle, (FenceKnock * (int)FULL_WIDTH));
 		EndTimeSlice();
 	}
-}
-
-/***** PD LOOP *****/
-
-int clawPDTarget = PD_BACK;
-
-/*
-Function that sets the PD feedback loop's target value.
-Takes the following inputs:
-- @target	: The desired target value
-Has no outputs.
-*/
-void setClawPDTarget(int target)
-{
-	PDt
 }
 
 /*

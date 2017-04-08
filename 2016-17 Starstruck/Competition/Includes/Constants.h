@@ -26,7 +26,7 @@ const int PD_CLOSED = 0;
 const int PD_OPEN = 0;
 const int PD_FULL_WIDTH = 0;
 const int PD_BACK = 0;
-const int SLOW_CLAW_ADJUST
+const float SLOW_CLAW_ADJUST = 0.5;
 
 //Max and min lift height
 const int MAX_LIFT_HEIGHT = 5000;
