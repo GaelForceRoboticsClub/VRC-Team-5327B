@@ -1,8 +1,8 @@
 //This header file contains joystick button definitions to make the code easier to read.
 
 //Base control
-#define R_Base vexRT[Ch2]
-#define L_Base vexRT[Ch3]
+#define RBase vexRT[Ch2]
+#define LBase vexRT[Ch3]
 
 //Lift control
 #define LiftUp vexRT[Btn6U]

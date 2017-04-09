@@ -22,8 +22,8 @@ int clawPDTarget = PD_BACK;
 
 //PD loop constants
 //(Not defined as constants so they can be modified in debugger)
-int clawPDKp = 0.0;
-int clawPDKd = 0.0;
+float clawPDKp = 0.0;
+float clawPDKd = 0.0;
 
 /*
 Function that sets the PD feedback loop's target value.
@@ -33,6 +33,8 @@ Has no outputs.
 */
 void setClawPDTarget(int target)
 {
+	target = target > CLAW_MAX ? CLAW_MAX - CLAW_TOLERANCE : target;
+	target = target < CLAW_MIN ? CLAW_MIN + CLAW_TOLERANCE : target;
 	clawPDTarget = target;
 }
 
@@ -70,14 +72,26 @@ void setClaw(int speed)
 	motor[Claw] = speed;
 }
 
+/*
+Function that helps ensure claw doesn't close too much.
+Has no inputs.
+Returns the following outputs:
+- @return : True if we are too closed, False if we are safe.
+*/
 bool clawTooClosed()
 {
-	return (SensorValue[ClawPot] < CLAW_MIN - CLAW_THRESHOLD);
+	return (SensorValue[ClawPot] < CLAW_MIN - CLAW_TOLERANCE);
 }
 
+/*
+Function that helps ensure claw doesn't open too much.
+Has no inputs.
+Returns the following outputs:
+- @return : True if we are too wide, False if we are safe.
+*/
 bool clawTooOpen()
 {
-	return (SensorValue[ClawPot] > CLAW_MAX + CLAW_THRESHOLD);
+	return (SensorValue[ClawPot] > CLAW_MAX + CLAW_TOLERANCE);
 }
 
 /*
@@ -88,13 +102,13 @@ Takes the following inputs:
 - @preset			: The desired preset width for the claw
 Has no outputs.
 */
-void driverClawControl(int clawAdjust, int toggle = 0, int preset = 0)
+void driverClawControl(float clawAdjust, int toggle = 0, int preset = 0)
 {
-	if(clawAdjust != 0)
+	if(clawAdjust != 0.0)
 	{
 		driverControllingClaw = true;						//Give full control to driver
 		//Make sure claw doesn't go beyond limits
-		if(clawAdjust > 0 && !clawTooClosed() || clawAdjust < 0 && !clawTooOpen())
+		if((clawAdjust > 0 && !clawTooClosed()) || (clawAdjust < 0 && !clawTooOpen()))
 		{
 			setClaw(clawAdjust * 127);
 		}
@@ -122,7 +136,7 @@ task intake()
 	while(true)
 	{
 		driverClawControl(
-		(ClawOpen + SLOW_CLAW_ADJUST * ClawOpenSlow - ClawClose - SLOW_CLAW_ADJUST * ClawCloseSlow) * 127,
+		(ClawOpen + CLAW_SLOW_ADJUST * ClawOpenSlow - ClawClose - CLAW_SLOW_ADJUST * ClawCloseSlow) * 127,
 		ClawToggle, (FenceKnock * (int)FULL_WIDTH));
 		EndTimeSlice();
 	}
@@ -141,7 +155,7 @@ task clawPD()
 	{
 		if(driverControllingClaw)	//If driver is moving claw, give him full control
 		{
-			//Reset all constants
+			//Reset all variables
 			clawPDError = 0;
 			clawPDLastError = 0;
 			clawPDDerivative = 0;
@@ -155,7 +169,7 @@ task clawPD()
 			//Calculate current error
 			clawPDError = clawPDCurr - clawPDTarget;
 			//Check if error is big enough to bother fixing
-			if(clawPDError > CLAW_THRESHOLD)
+			if(abs(clawPDError) > CLAW_TOLERANCE)
 			{
 				//Calculate derivative; since delta time is ~constant,
 				//it can be safely ignored and just factored into Kd
@@ -163,7 +177,7 @@ task clawPD()
 				//Update last error for next loop
 				clawPDLastError = clawPDError;
 				//Finally, combine P and D to determine output
-				motor[Claw] = clawPDKp * clawPDLastError + clawPDKd * clawPDDerivative;
+				setClaw(clawPDKp * clawPDLastError + clawPDKd * clawPDDerivative);
 			}
 		}
 		EndTimeSlice();

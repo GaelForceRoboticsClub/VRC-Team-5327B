@@ -37,14 +37,36 @@ V5.3.2
 #include "Claw.h" 					//All claw-control code
 #include "Lift.h" 					//All lift-control code
 #include "LCD.h"						//All LCD code
+#include "SFX.h"
 //#include "Auton_Func.h"			//Autonomous function code
 //#include "Auton_Routines.h" //Autonomous routines code
+
+/*
+Function that starts tasks that need to always be on.
+Has no inputs or outputs.
+*/
+void startAlwaysTasks()
+{
+	startTask(LCD);
+	startTask(baseSlewControl, 30);	//Super priority to Slew control
+	startTask(liftSlewControl, 30);
+	startTask(liftPD, 20);					//Priority to PD loops
+	startTask(clawPD, 20);
+}
+
+void startDriverTasks()
+{
+	startTask(base);
+	startTask(lift);
+	startTask(intake);
+	startTask(sfx);
+}
 
 //Ready for match after reconnect
 void pre_auton()
 {
+	startAlwaysTasks();
 	bStopTasksBetweenModes = false;
-	startTask(LCD);
 	//By slaving motors together, they can never accidentally drive in opposite directions
 	slaveMotor(RBBase, RFBase);
 	slaveMotor(LBBase, LFBase);
@@ -68,12 +90,8 @@ task autonomous()
 
 task usercontrol()
 {
-	startTask(base);
-	startTask(baseSlewControl, 30); //Slew rate given super priority
-	startTask(intake);
-	startTask(clawPD, 20);				 	//PD loops given priority
-	startTask(lift);
-	//startTask(sfx);
+	startAlwaysTasks();	//Just in case comp control has turned them off
+	startDriverTasks();	//Activate everything for driver
 	while(true)
 	{
 		EndTimeSlice();

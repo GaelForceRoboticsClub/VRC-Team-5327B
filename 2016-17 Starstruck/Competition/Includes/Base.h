@@ -44,6 +44,9 @@ task base()
 	}
 }
 
+/*
+Task limiting rate of change of base to prevent damage to internal gears.
+*/
 task baseSlewControl()
 {
 	while(true)
