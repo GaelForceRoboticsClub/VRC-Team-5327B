@@ -98,13 +98,6 @@ void driverLiftControl(float adjustDir)
 	}*/
 }
 
-void bandsRelease(int trigger)
-{
-	if(trigger)
-	{
-		SensorValue[Bands] = abs(1 - SensorValue[Bands]);
-	}
-}
 
 /*
 Task that controls lifting.

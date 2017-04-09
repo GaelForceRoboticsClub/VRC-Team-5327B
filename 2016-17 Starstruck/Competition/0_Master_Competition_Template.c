@@ -1,12 +1,13 @@
 #pragma config(Sensor, in1,    LiftPot,        sensorPotentiometer)
-#pragma config(Sensor, in2,    RLine,          sensorLineFollower)
-#pragma config(Sensor, in3,    LLine,          sensorLineFollower)
-#pragma config(Sensor, in4,    Gyro,           sensorGyro)
+#pragma config(Sensor, in2,    ClawPot,        sensorPotentiometer)
+#pragma config(Sensor, in3,    RLine,          sensorLineFollower)
+#pragma config(Sensor, in4,    LLine,          sensorLineFollower)
+#pragma config(Sensor, in5,    Gyro,           sensorGyro)
+#pragma config(Sensor, in6,    TipDetect,      sensorAccelerometer)
 #pragma config(Sensor, dgtl1,  RBaseEnc,       sensorQuadEncoder)
-#pragma config(Sensor, dgtl3,  ,               sensorQuadEncoder)
-#pragma config(Sensor, I2C_1,  RBaseEnc,       sensorNone)
-#pragma config(Motor,  port2,           RFBase,        tmotorVex393_MC29, PIDControl, reversed, driveRight, encoderPort, dgtl1)
-#pragma config(Motor,  port3,           LFBase,        tmotorVex393_MC29, PIDControl, driveLeft, encoderPort, dgtl3)
+#pragma config(Sensor, dgtl3,  LBaseEnc,               sensorQuadEncoder)
+#pragma config(Motor,  port2,           RFBase,        tmotorVex393_MC29, openLoop, reversed, driveRight, encoderPort, dgtl1)
+#pragma config(Motor,  port3,           LFBase,        tmotorVex393_MC29, openLoop, driveLeft, encoderPort, dgtl3)
 #pragma config(Motor,  port4,           LiftR12,       tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port5,           LiftL12,       tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port6,           RBBase,        tmotorVex393_MC29, openLoop, reversed, driveRight, encoderPort, None)
@@ -42,17 +43,19 @@ V5.3.2
 //Ready for match after reconnect
 void pre_auton()
 {
+	bStopTasksBetweenModes = false;
 	startTask(LCD);
 	//By slaving motors together, they can never accidentally drive in opposite directions
-	lift_hold = 0;
 	slaveMotor(RBBase, RFBase);
 	slaveMotor(LBBase, LFBase);
 	slaveMotor(LiftR3L3, LiftR12);
 	slaveMotor(LiftL12, LiftR12);
-	//Warning sound before claw close
-	playTone(750, 10);
-	wait1Msec(500);
-	presetClaw(CLOSED);
+	//Get claw PD running
+	presetClaw(BACK);
+	//Ready to go
+	playTone(soundShortBlip);
+	wait1Msec(250);
+	playTone(soundShortBlip);
 }
 
 bool auton_flag = false;
@@ -65,9 +68,10 @@ task autonomous()
 
 task usercontrol()
 {
-
 	startTask(base);
+	startTask(baseSlewControl, 30); //Slew rate given super priority
 	startTask(intake);
+	startTask(clawPD, 20);				 	//PD loops given priority
 	startTask(lift);
 	//startTask(sfx);
 	while(true)
