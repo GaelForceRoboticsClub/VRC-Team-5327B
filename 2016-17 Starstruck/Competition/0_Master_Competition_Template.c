@@ -1,11 +1,13 @@
-#pragma config(Sensor, in1,    LiftPot,        sensorPotentiometer)
-#pragma config(Sensor, in2,    ClawPot,        sensorPotentiometer)
-#pragma config(Sensor, in3,    RLine,          sensorLineFollower)
-#pragma config(Sensor, in4,    LLine,          sensorLineFollower)
-#pragma config(Sensor, in5,    Gyro,           sensorGyro)
-#pragma config(Sensor, in6,    TipDetect,      sensorAccelerometer)
+#pragma config(UART_Usage, UART1, uartVEXLCD, baudRate19200, IOPins, None, None)
+#pragma config(UART_Usage, UART2, uartNotUsed, baudRate4800, IOPins, None, None)
+#pragma config(Sensor, in2,    LiftPot,        sensorPotentiometer)
+#pragma config(Sensor, in3,    ClawPot,        sensorPotentiometer)
+#pragma config(Sensor, in4,    RLine,          sensorLineFollower)
+#pragma config(Sensor, in5,    LLine,          sensorLineFollower)
+#pragma config(Sensor, in6,    Gyro,           sensorGyro)
+#pragma config(Sensor, in7,    TipDetect,      sensorAccelerometer)
 #pragma config(Sensor, dgtl1,  RBaseEnc,       sensorQuadEncoder)
-#pragma config(Sensor, dgtl3,  LBaseEnc,               sensorQuadEncoder)
+#pragma config(Sensor, dgtl3,  LBaseEnc,       sensorQuadEncoder)
 #pragma config(Motor,  port2,           RFBase,        tmotorVex393_MC29, openLoop, reversed, driveRight, encoderPort, dgtl1)
 #pragma config(Motor,  port3,           LFBase,        tmotorVex393_MC29, openLoop, driveLeft, encoderPort, dgtl3)
 #pragma config(Motor,  port4,           LiftR12,       tmotorVex393_MC29, openLoop)
@@ -48,10 +50,10 @@ Has no inputs or outputs.
 void startAlwaysTasks()
 {
 	startTask(LCD);
-	startTask(baseSlewControl, 30);	//Super priority to Slew control
-	startTask(liftSlewControl, 30);
-	startTask(liftPD, 20);					//Priority to PD loops
-	startTask(clawPD, 20);
+	startTask(baseSlewControl);	//Super priority to Slew control
+	startTask(liftSlewControl);
+	//startTask(liftPD);
+	startTask(clawPD, 10);
 }
 
 void startDriverTasks()
@@ -59,41 +61,51 @@ void startDriverTasks()
 	startTask(base);
 	startTask(lift);
 	startTask(intake);
-	startTask(sfx);
+	startTask(SFX);
+}
+
+void failsafeChecks()
+{
+	liftFailsafeCheck();
+	clawFailsafeCheck();
 }
 
 //Ready for match after reconnect
 void pre_auton()
 {
 	startAlwaysTasks();
-	bStopTasksBetweenModes = false;
 	//By slaving motors together, they can never accidentally drive in opposite directions
 	slaveMotor(RBBase, RFBase);
 	slaveMotor(LBBase, LFBase);
 	slaveMotor(LiftR3L3, LiftR12);
 	slaveMotor(LiftL12, LiftR12);
 	//Get claw PD running
-	presetClaw(BACK);
+	//presetClaw(BACK);
 	//Ready to go
-	playTone(soundShortBlip);
-	wait1Msec(250);
-	playTone(soundShortBlip);
+	failsafeChecks();
+	if(!liftActivateFailsafe && !clawActivateFailsafe)
+	{
+		playSound(soundFastUpwardTones);
+	}
 }
 
 bool auton_flag = false;
 
 task autonomous()
 {
+	failsafeChecks();
 	//LeftC3S2x();
 	auton_flag = true;
 }
 
 task usercontrol()
 {
+	failsafeChecks();
 	startAlwaysTasks();	//Just in case comp control has turned them off
 	startDriverTasks();	//Activate everything for driver
 	while(true)
 	{
+		playImmediateTone(500, 1);
 		EndTimeSlice();
 	}
 }

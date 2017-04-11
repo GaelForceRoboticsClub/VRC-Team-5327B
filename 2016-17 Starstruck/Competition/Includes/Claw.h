@@ -22,8 +22,30 @@ int clawPDTarget = PD_BACK;
 
 //PD loop constants
 //(Not defined as constants so they can be modified in debugger)
-float clawPDKp = 0.0;
-float clawPDKd = 0.0;
+float clawPDKp = 0.2;
+float clawPDKd = 0.05;
+
+//Determines if we need to give full control to driver
+bool clawActivateFailsafe = false;
+
+/*
+Function that checks if we need to activate failsafe.
+Has no inputs or outputs.
+*/
+void clawFailsafeCheck()
+{
+	int counter = 0;
+	repeat(10)
+	{
+		counter += (abs(SensorValue[ClawPot] - 255) < 15) ? 1 : 0;
+		wait1Msec(1);
+	}
+	clawActivateFailsafe = counter >= 7;
+	if(clawActivateFailsafe)
+	{
+		playSound(soundLowBuzz);
+	}
+}
 
 /*
 Function that sets the PD feedback loop's target value.
@@ -80,6 +102,10 @@ Returns the following outputs:
 */
 bool clawTooClosed()
 {
+	if(clawActivateFailsafe)
+	{
+		return false;	//If failsafe is active, disable sensor control
+	}
 	return (SensorValue[ClawPot] < CLAW_MIN - CLAW_TOLERANCE);
 }
 
@@ -91,6 +117,10 @@ Returns the following outputs:
 */
 bool clawTooOpen()
 {
+	if(clawActivateFailsafe)
+	{
+		return false;	//If failsafe is active, disable sensor control
+	}
 	return (SensorValue[ClawPot] > CLAW_MAX + CLAW_TOLERANCE);
 }
 
@@ -102,9 +132,9 @@ Takes the following inputs:
 - @preset			: The desired preset width for the claw
 Has no outputs.
 */
-void driverClawControl(float clawAdjust, int toggle = 0, int preset = 0)
+void driverClawControl(float clawAdjust, int toggle = 0, int preset = -1)
 {
-	if(clawAdjust != 0.0)
+	if(true)
 	{
 		driverControllingClaw = true;						//Give full control to driver
 		//Make sure claw doesn't go beyond limits
@@ -120,7 +150,7 @@ void driverClawControl(float clawAdjust, int toggle = 0, int preset = 0)
 		{
 			presetClaw(currClawState >= (int)OPEN ? CLOSED : OPEN);
 		}
-		else
+		else if(preset != -1)
 		{
 			presetClaw(preset);
 		}
@@ -136,7 +166,7 @@ task intake()
 	while(true)
 	{
 		driverClawControl(
-		(ClawOpen + CLAW_SLOW_ADJUST * ClawOpenSlow - ClawClose - CLAW_SLOW_ADJUST * ClawCloseSlow) * 127,
+		(ClawOpen + CLAW_SLOW_ADJUST * ClawOpenSlow - ClawClose - CLAW_SLOW_ADJUST * ClawCloseSlow),
 		ClawToggle, (FenceKnock * (int)FULL_WIDTH));
 		EndTimeSlice();
 	}
@@ -147,7 +177,8 @@ Task that controls PD for claw.
 */
 task clawPD()
 {
-	int clawPDCurr = SensorValue[ClawPot];
+	setClawPDTarget(1000);
+	int clawPDCurr = 0;
 	int clawPDError = 0;
 	int clawPDLastError = 0;
 	int clawPDDerivative = 0;
@@ -179,6 +210,10 @@ task clawPD()
 				//Finally, combine P and D to determine output
 				setClaw(clawPDKp * clawPDLastError + clawPDKd * clawPDDerivative);
 			}
+		}
+		if(clawActivateFailsafe)
+		{
+			break;
 		}
 		EndTimeSlice();
 	}

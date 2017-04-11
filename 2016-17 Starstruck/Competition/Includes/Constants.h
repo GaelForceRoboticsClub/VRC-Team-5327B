@@ -27,14 +27,14 @@ const int PD_CLOSED = 0;
 const int PD_OPEN = 0;
 const int PD_FULL_WIDTH = 0;
 const int PD_BACK = 0;
-const float CLAW_SLOW_ADJUST = 0.5;
-const int CLAW_MIN = 300;
+const float CLAW_SLOW_ADJUST = 0.2;
+const int CLAW_MIN = 500;
 const int CLAW_MAX = 3750;
 const int CLAW_TOLERANCE = 50;
 
 //Lift constants
-const int LIFT_MAX = 3900;
-const int LIFT_MIN = 840;
+const int LIFT_MAX = 3250;
+const int LIFT_MIN = 450;
 const int LIFT_TOLERANCE = 150;
 const float LIFT_SLOW_UP = 0.5;
 const float LIFT_SLOW_DOWN = 0.3;

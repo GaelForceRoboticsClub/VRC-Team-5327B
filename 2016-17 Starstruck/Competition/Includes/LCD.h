@@ -141,9 +141,14 @@ task LCD()
 	bLCDBacklight = true;
 	bool noButtonsPressed = true;
 	clearTimer(timer1);
-	//Only run in pre-auton
-	while(bIfiRobotDisabled)
+	clearTimer(timer2);
+	while(true)
 	{
+		if(!noButtonsPressed)
+		{
+			clearTimer(timer2);
+		}
+		bLCDBacklight = (time1[timer2] <= 5000);
 		//Switch to respond to user input
 		if(noButtonsPressed){
 			switch(nLCDButtons){
@@ -166,12 +171,11 @@ task LCD()
 		LCDDisplay(menuIndex[0], menuIndex[1], menuIndex[2], confirmed);
 		wait1Msec(20);
 		//Play chirpy warning sound every 5 seconds as a reminder
-		if(!confirmed && time1[timer1] >= 5000)
+		if(bIfiRobotDisabled && !confirmed && time1[timer1] >= 5000)
 		{
-			playSound(soundLowBuzz);
+			playSound(soundBlip);
 			clearTimer(timer1);
 		}
+		EndTimeSlice();
 	}
-	//Turn backlight off to save power
-	bLCDBacklight = false;
 }
