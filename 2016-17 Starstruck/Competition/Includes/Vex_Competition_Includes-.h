@@ -46,8 +46,6 @@ task usercontrol();
 int nTimeXX = 0;
 bool bStopTasksBetweenModes = true;
 
-static void displayStatusAndTime();
-
 task main()
 {
 	// Master CPU will not let competition start until powered on for at least 2-seconds
@@ -171,49 +169,4 @@ void allTasksStop()
   stopTask(18);
   stopTask(19);
 #endif
-}
-
-static void displayStatusAndTime()
-{
-  displayLCDPos(1, 0);
-	if (bIfiRobotDisabled)
-	  displayNextLCDString("Disable ");
-	else
-	{
-	  if (bIfiAutonomousMode)
-	    displayNextLCDString("Auton  ");
-	  else
-	    displayNextLCDString("Driver ");
-	}
-	displayNextLCDNumber(nTimeXX / 600, 2);
-	displayNextLCDChar(':');
-	displayNextLCDNumber((nTimeXX / 10) % 60, -2);
-	displayNextLCDChar('.');
-	displayNextLCDNumber(nTimeXX % 10, 1);
-}
-
-
-static void UserControlCodePlaceholderForTesting()
-{
-  // Following code is simply for initial debuggging.
-  //
-  // It can be safely removed in a real program	and removing it will slightly improve the
-  // real-time performance of your robot.
-	//
-  displayStatusAndTime();
-	wait1Msec(100);
-	++nTimeXX;
-}
-
-static void AutonomousCodePlaceholderForTesting()
-{
-	// This is where you insert your autonomous code. Because we don't have any, we'll
-	// simply display a running count of the time on the VEX LCD.
-
-	while (true)
-	{
-	  displayStatusAndTime();
-		wait1Msec(100);
-		++nTimeXX;
-	}
 }

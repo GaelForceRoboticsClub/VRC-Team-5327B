@@ -541,6 +541,10 @@ to robotsketchcreate
 end
 
 to deletesketch
+  if not any? robotsketches [
+    user-message "No robot sketches to delete."
+    stop
+  ]
   let sketch-to-be-deleted user-one-of "Which sketch would you like to delete?" robotsketch_array
   set robotsketch_array remove sketch-to-be-deleted robotsketch_array
   ask robotsketches with [ID = sketch-to-be-deleted]
@@ -550,7 +554,9 @@ to deletesketch
 end
 
 to importrobotsketch
-  let newsketch_array read-from-string user-input "Please enter the exported sketch you would like to import:"
+  carefully
+  [
+    let newsketch_array read-from-string user-input "Please enter the exported sketch you would like to import:"
   set robotsketch_array lput first newsketch_array robotsketch_array
   create-robotsketches 1 [
     set ID item 0 newsketch_array
@@ -563,6 +569,10 @@ to importrobotsketch
     set dumper_range item 7 newsketch_array
     set hang_type item 8 newsketch_array
     set size 0
+  ]
+  ]
+  [
+    user-message "Import failed. Check format?"
   ]
 end
 
@@ -583,6 +593,10 @@ to exportrobotsketch
 end
 
 to addrobottofield
+  if not any? robotsketches [
+    user-message "Please add a robot sketch first."
+    stop
+  ]
   create-robots 1 [
     set intaking? false
     set dumpPos "low"
@@ -660,6 +674,10 @@ to addrobottofield
 end
 
 to robotdelete
+  if not any? robotsketches [
+    user-message "No robots to delete."
+    stop
+  ]
   let robot-to-be-deleted user-one-of "Which robot would you like to delete?" robot_array
   set robot_array remove robot-to-be-deleted robot_array
   ask robots with [robotID = robot-to-be-deleted]
@@ -682,6 +700,10 @@ end
 
 
 to deleteFrame
+  if not any? frames [
+    user-message "No frames to delete."
+    stop
+  ]
   let frameToBeDel user-one-of "Please select a frame to delete:" frames_array
   set frames_array remove frameToBeDel frames_array
   ask frames with [frameID = frameToBeDel]
@@ -830,20 +852,33 @@ to dispFrame [frameBeingDisp]
 end
 
 to showFrame
+  if not any? frames [
+    user-message "Please add a frame first."
+    stop
+  ]
   let frameToBeDisp user-one-of "Please select a frame to display:" frames_array
   dispFrame frametobedisp
 end
 
 to nextframe
+  if not any? frames [
+    user-message "Please add a frame first."
+    stop
+  ]
   carefully [
     set currframe min list (currFrame + 1) (length frames_array - 1)
   ]
   [
     set currframe 0
-  ]dispFrame item currFrame frames_array
+  ]
+  dispFrame item currFrame frames_array
 end
 
 to previousframe
+  if not any? frames [
+    user-message "Please add a frame first."
+    stop
+  ]
   carefully[
     set currframe max list (currFrame - 1) (0)
   ]
@@ -1080,6 +1115,8 @@ end
 
 to generateCode
   file-close-all
+  carefully
+  [
   file-open user-new-file
   let fileName user-input "Enter a name for this routine:"
   file-print "//Automatically generated code via VRC 5327B Starstruck Simulation"
@@ -1139,7 +1176,10 @@ to generateCode
     ]
     set currentFrameCode currentFrameCode + 1
   ]
-  file-print "}"
+  file-print "}"]
+  [
+    user-message "Generate RobotC failed. Try again, or contact for help."
+  ]
   file-close-all
 end
 @#$#@#$#@
@@ -1676,6 +1716,16 @@ Practice?
 0
 1
 -1000
+
+TEXTBOX
+60
+470
+354
+668
+Copyright 2017 VRC Team 5327B\nGael Force Robotics\nDublin High School\nDublin, CA, USA\n\nContact:\ngaelforce@dhsrobotics.com\nSubject line: [Sim]
+14
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
