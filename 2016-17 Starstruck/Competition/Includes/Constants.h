@@ -23,12 +23,12 @@ const int SLEW_RATE_INCREMENT = 20;
 const int SLEW_RATE_WAIT = 20;
 
 //Claw constants
-const int PD_CLOSED = 0;
-const int PD_OPEN = 0;
-const int PD_FULL_WIDTH = 0;
+const int PD_CLOSED = 400;
+const int PD_OPEN = 1000;
+const int PD_FULL_WIDTH = 1800;
 const int PD_BACK = 0;
 const float CLAW_SLOW_ADJUST = 0.2;
-const int CLAW_MIN = 500;
+const int CLAW_MIN = 400;
 const int CLAW_MAX = 3750;
 const int CLAW_TOLERANCE = 50;
 

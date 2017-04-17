@@ -1,12 +1,10 @@
 //This header file contains all code for controlling the claw intake.
 
 //Enum clawStates stores the various presets and their corresponding numerical value
-enum clawStates{
-	CLOSED = 0,			//Pinched around objects
-	OPEN = 1,				//Open at typical claw angle (~130 degrees)
-	FULL_WIDTH = 2,	//Open at full width (180 degrees)
-	BACK = 3				//Claw folded up for reset (360 degrees)
-};
+#define CLOSED 0
+#define OPEN 1
+#define FULL_WIDTH 2
+#define BACK 3
 
 //Stores previous toggle state to prevent accidental rapid switching
 int previousToggle = 0;
@@ -14,15 +12,12 @@ int previousToggle = 0;
 //Determines whether driver or PD loop should be in control
 bool driverControllingClaw = false;
 
-//Stores current claw state
-int currClawState = BACK;
-
 //Stores target claw state for PD loop
 int clawPDTarget = PD_BACK;
 
 //PD loop constants
 //(Not defined as constants so they can be modified in debugger)
-float clawPDKp = 0.2;
+float clawPDKp = 0.15;
 float clawPDKd = 0.05;
 
 //Determines if we need to give full control to driver
@@ -58,29 +53,6 @@ void setClawPDTarget(int target)
 	target = target > CLAW_MAX ? CLAW_MAX - CLAW_TOLERANCE : target;
 	target = target < CLAW_MIN ? CLAW_MIN + CLAW_TOLERANCE : target;
 	clawPDTarget = target;
-}
-
-/*
-Function that translates preset states into PD target for the claw.
-Takes the following inputs:
-- @state : The desired preset state for the claw
-Has no outputs.
-*/
-void presetClaw(int state)
-{
-	switch(state)
-	{
-	case CLOSED:
-		setClawPDTarget(PD_CLOSED);
-	case OPEN:
-		setClawPDTarget(PD_OPEN);
-	case FULL_WIDTH:
-		setClawPDTarget(PD_FULL_WIDTH);
-	case BACK:
-		setClawPDTarget(PD_BACK);
-	default:
-	}
-	currClawState = state;
 }
 
 /*
@@ -129,12 +101,12 @@ Function that controls the opening and closing of the claw intake.
 Takes the following inputs:
 - @clawAdjust : The direction the claw should be adjusted
 - @toggle			: The input toggle between open and closed
-- @preset			: The desired preset width for the claw
+- @fencePreset			: The desired preset width for the claw
 Has no outputs.
 */
-void driverClawControl(float clawAdjust, int toggle = 0, int preset = -1)
+void driverClawControl(float clawAdjust, int toggle = 0, int fencePreset = 0)
 {
-	if(true)
+	if(clawAdjust != 0)
 	{
 		driverControllingClaw = true;						//Give full control to driver
 		//Make sure claw doesn't go beyond limits
@@ -146,13 +118,20 @@ void driverClawControl(float clawAdjust, int toggle = 0, int preset = -1)
 	else
 	{
 		driverControllingClaw = false;					//Allow PD to control claw
-		if(toggle == 1 && previousToggle == 0)	//Make sure this is a unique toggle
+		if(toggle == 1 && previousToggle == 0)
 		{
-			presetClaw(currClawState >= (int)OPEN ? CLOSED : OPEN);
+			if(SensorValue[LiftPot] > (0.5 * (LIFT_MAX - LIFT_MIN)) + LIFT_MIN)
+			{
+				setClawPDTarget(PD_OPEN);
+			}
+			else
+			{
+				setClawPDTarget(PD_CLOSED);
+			}
 		}
-		else if(preset != -1)
+		else if(fencePreset == 1)
 		{
-			presetClaw(preset);
+			setClawPDTarget(PD_FULL_WIDTH);
 		}
 	}
 	previousToggle = toggle;
@@ -165,9 +144,7 @@ task intake()
 {
 	while(true)
 	{
-		driverClawControl(
-		(ClawOpen + CLAW_SLOW_ADJUST * ClawOpenSlow - ClawClose - CLAW_SLOW_ADJUST * ClawCloseSlow),
-		ClawToggle, (FenceKnock * (int)FULL_WIDTH));
+		driverClawControl((ClawOpen + CLAW_SLOW_ADJUST * ClawOpenSlow - ClawClose - CLAW_SLOW_ADJUST * ClawCloseSlow), ClawToggle, ClawFenceKnock);
 		EndTimeSlice();
 	}
 }
@@ -177,7 +154,7 @@ Task that controls PD for claw.
 */
 task clawPD()
 {
-	setClawPDTarget(1000);
+	setClawPDTarget(PD_BACK);
 	int clawPDCurr = 0;
 	int clawPDError = 0;
 	int clawPDLastError = 0;
@@ -186,12 +163,12 @@ task clawPD()
 	{
 		if(driverControllingClaw)	//If driver is moving claw, give him full control
 		{
+			//Keep target for PD loop updated, so loop is always ready when driver lets go
+			setClawPDTarget(SensorValue[ClawPot]);
 			//Reset all variables
 			clawPDError = 0;
 			clawPDLastError = 0;
 			clawPDDerivative = 0;
-			//Keep target for PD loop updated, so loop is always ready when driver lets go
-			setClawPDTarget(SensorValue[ClawPot]);
 		}
 		else	//Otherwise, let PD take care of it
 		{
@@ -208,7 +185,8 @@ task clawPD()
 				//Update last error for next loop
 				clawPDLastError = clawPDError;
 				//Finally, combine P and D to determine output
-				setClaw(clawPDKp * clawPDLastError + clawPDKd * clawPDDerivative);
+				setClaw(-(clawPDKp * clawPDLastError + clawPDKd * clawPDDerivative));
+
 			}
 		}
 		if(clawActivateFailsafe)
