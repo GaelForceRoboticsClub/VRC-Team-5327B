@@ -33,8 +33,10 @@ const int CLAW_MAX = 3750;
 const int CLAW_TOLERANCE = 50;
 
 //Lift constants
-const int LIFT_MAX = 3250;
-const int LIFT_MIN = 450;
-const int LIFT_TOLERANCE = 150;
+const int LIFT_MAX = 3350;
+const int LIFT_MIN = 270;
+const int LIFT_THRESHOLD = 1100;
+const int LIFT_TOLERANCE = 250;
 const float LIFT_SLOW_UP = 0.5;
 const float LIFT_SLOW_DOWN = 0.3;
+const int SLEW_RATE_INCREMENT_LIFT = 255;

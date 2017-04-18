@@ -17,7 +17,7 @@ int clawPDTarget = PD_BACK;
 
 //PD loop constants
 //(Not defined as constants so they can be modified in debugger)
-float clawPDKp = 0.15;
+float clawPDKp = 0.2;
 float clawPDKd = 0.05;
 
 //Determines if we need to give full control to driver
@@ -34,6 +34,11 @@ void clawFailsafeCheck()
 	{
 		counter += (abs(SensorValue[ClawPot] - 255) < 15) ? 1 : 0;
 		wait1Msec(1);
+		if(counter >= 3)
+		{
+			motor[Claw] = 25;
+			wait1Msec(250);
+		}
 	}
 	clawActivateFailsafe = counter >= 7;
 	if(clawActivateFailsafe)
@@ -101,7 +106,7 @@ Function that controls the opening and closing of the claw intake.
 Takes the following inputs:
 - @clawAdjust : The direction the claw should be adjusted
 - @toggle			: The input toggle between open and closed
-- @fencePreset			: The desired preset width for the claw
+- @fencePreset: The desired preset width for the claw
 Has no outputs.
 */
 void driverClawControl(float clawAdjust, int toggle = 0, int fencePreset = 0)
@@ -120,7 +125,7 @@ void driverClawControl(float clawAdjust, int toggle = 0, int fencePreset = 0)
 		driverControllingClaw = false;					//Allow PD to control claw
 		if(toggle == 1 && previousToggle == 0)
 		{
-			if(SensorValue[LiftPot] > (0.5 * (LIFT_MAX - LIFT_MIN)) + LIFT_MIN)
+			if(SensorValue[LiftPot] > LIFT_THRESHOLD)
 			{
 				setClawPDTarget(PD_OPEN);
 			}
@@ -186,13 +191,13 @@ task clawPD()
 				clawPDLastError = clawPDError;
 				//Finally, combine P and D to determine output
 				setClaw(-(clawPDKp * clawPDLastError + clawPDKd * clawPDDerivative));
-
 			}
 		}
 		if(clawActivateFailsafe)
 		{
 			break;
 		}
+		wait1Msec(15);
 		EndTimeSlice();
 	}
 }

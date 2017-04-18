@@ -11,8 +11,8 @@ int liftPDTarget = LIFT_MIN;
 
 //PD loop constants
 //(Not defined as constants so they can be modified in debugger)
-float liftPDKp = 0.0;
-float liftPDKd = 0.0;
+float liftPDKp = 0.25;
+float liftPDKd = 0.5;
 
 //Determines if we need to give full control to driver
 bool liftActivateFailsafe = false;
@@ -26,8 +26,13 @@ void liftFailsafeCheck()
 	int counter = 0;
 	repeat(10)
 	{
-		counter += (abs(SensorValue[LiftPot] - 255) < 15) ? 1 : 0;
+		counter += (abs(SensorValue[LiftPot] - 255) < 5) ? 1 : 0;
 		wait1Msec(1);
+		if(counter >= 3)
+		{
+			motor[LiftR12] = 45;
+			wait1Msec(250);
+		}
 	}
 	liftActivateFailsafe = (counter >= 7);
 	if(liftActivateFailsafe)
@@ -44,9 +49,9 @@ Has no outputs.
 */
 void setLiftPDTarget(int target)
 {
-	target = target > CLAW_MAX ? CLAW_MAX - CLAW_TOLERANCE : target;
-	target = target < CLAW_MIN ? CLAW_MIN + CLAW_TOLERANCE : target;
-	clawPDTarget = target;
+	target = target > LIFT_MAX ? LIFT_MAX - LIFT_TOLERANCE : target;
+	target = target < LIFT_MIN ? LIFT_MIN + LIFT_TOLERANCE : target;
+	liftPDTarget = target;
 }
 
 /*
@@ -89,7 +94,8 @@ void setLift(int speed)
 {
 	liftSlewTarget = speed; //Use slew rate control to prevent wearing down of internal gears
 }
-
+int lift_hold = 0;
+int desiredValue = LIFT_MIN;
 /*
 Function that controls the lift movement.
 Takes the following inputs:
@@ -101,16 +107,36 @@ void driverLiftControl(float adjustDir)
 	if(adjustDir != 0.0)
 	{
 		driverControllingLift = true;						//Give full control to driver
+		lift_hold = 0;
 		//Make sure lift doesn't go beyond limits
 		if((adjustDir > 0 && !liftTooHigh()) || (adjustDir < 0 && !liftTooLow()))
 		{
 			setLift(adjustDir * 127);
 		}
+		desiredValue = SensorValue[LiftPot];
 	}
 	else
 	{
-		driverControllingLift = false;					//Allow PD to control lift
-		setLift(0);	//TEMPORARY - for testing
+		if(SensorValue[LiftPot] < 290)
+		{
+			setLift(-10);
+		}
+		else if(SensorValue[LiftPot] < 850)
+		{
+			setLift(15);
+		}
+		else if(SensorValue[LiftPot] < 2000)
+		{
+			setLift(5);
+		}
+		else if(SensorValue[LiftPot] < 2500)
+		{
+			setLift(-15);
+		}
+		else
+		{
+			setLift(-25);
+		}
 	}
 }
 
@@ -151,24 +177,22 @@ task liftPD()
 			//Find current value
 			liftPDCurr = SensorValue[LiftPot];
 			//Calculate current error
-			liftPDError = liftPDCurr - liftPDTarget;
+
 			//Check if error is big enough to bother fixing
-			if(abs(liftPDError) > LIFT_TOLERANCE)
-			{
-				//Calculate derivative; since delta time is ~constant,
-				//it can be safely ignored and just factored into Kd
-				liftPDDerivative = liftPDError - liftPDLastError;
-				//Update last error for next loop
-				liftPDLastError = liftPDError;
-				//Finally, combine P and D to determine output
-				setLift(liftPDKp * liftPDLastError + liftPDKd * liftPDDerivative);
-			}
+
+			//Calculate derivative; since delta time is ~constant,
+			//it can be safely ignored and just factored into Kd
+			liftPDDerivative = liftPDError - liftPDLastError;
+			//Update last error for next loop
+			liftPDLastError = liftPDError;
+			//Finally, combine P and D to determine output
+			setLift(-(liftPDKp * liftPDLastError + liftPDKd * liftPDDerivative));
 		}
 		if(liftActivateFailsafe)
 		{
 			break;	//No PD loop if failsafe is active
 		}
-		EndTimeSlice();
+		wait1Msec(15);
 	}
 }
 
@@ -179,9 +203,9 @@ task liftSlewControl()
 {
 	while(true)
 	{
-		if(abs(motor[LiftR12] - liftSlewTarget) > SLEW_RATE_INCREMENT)
+		if(abs(motor[LiftR12] - liftSlewTarget) > SLEW_RATE_INCREMENT_LIFT)
 		{
-			motor[LiftR12] += SLEW_RATE_INCREMENT * sgn(liftSlewTarget - motor[LiftR12]);
+			motor[LiftR12] += SLEW_RATE_INCREMENT_LIFT * sgn(liftSlewTarget - motor[LiftR12]);
 		}
 		else
 		{

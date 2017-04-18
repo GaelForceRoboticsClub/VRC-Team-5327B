@@ -1,11 +1,11 @@
 #pragma config(UART_Usage, UART1, uartVEXLCD, baudRate19200, IOPins, None, None)
 #pragma config(UART_Usage, UART2, uartNotUsed, baudRate4800, IOPins, None, None)
-#pragma config(Sensor, in1,    LiftPot,        sensorPotentiometer)
 #pragma config(Sensor, in2,    ClawPot,        sensorPotentiometer)
 #pragma config(Sensor, in3,    RLine,          sensorLineFollower)
 #pragma config(Sensor, in4,    LLine,          sensorLineFollower)
 #pragma config(Sensor, in5,    Gyro,           sensorGyro)
 #pragma config(Sensor, in6,    TipDetect,      sensorAccelerometer)
+#pragma config(Sensor, in7,    LiftPot,        sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  RBaseEnc,       sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  LBaseEnc,       sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  ClawUltra,      sensorSONAR_inch)
@@ -51,8 +51,8 @@ Has no inputs or outputs.
 void startAlwaysTasks()
 {
 	startTask(LCD);
-	startTask(baseSlewControl);	//Super priority to Slew control
-	//startTask(liftSlewControl);
+	startTask(baseSlewControl);
+	startTask(liftSlewControl);
 	//startTask(liftPD);
 	startTask(clawPD);
 }
@@ -60,7 +60,7 @@ void startAlwaysTasks()
 void startDriverTasks()
 {
 	startTask(base);
-	//startTask(lift);
+	startTask(lift);
 	startTask(intake);
 	startTask(SFX);
 }
@@ -86,6 +86,7 @@ void pre_auton()
 	failsafeChecks();
 	if(!liftActivateFailsafe && !clawActivateFailsafe)
 	{
+		//We are good to go
 		playSound(soundFastUpwardTones);
 	}
 }
@@ -104,6 +105,8 @@ task usercontrol()
 	failsafeChecks();
 	startAlwaysTasks();	//Just in case comp control has turned them off
 	startDriverTasks();	//Activate everything for driver
+	wait1Msec(1000);
+	setLiftPDTarget(750);
 	while(true)
 	{
 		EndTimeSlice();
