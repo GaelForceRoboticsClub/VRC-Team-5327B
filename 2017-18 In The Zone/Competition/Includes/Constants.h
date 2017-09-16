@@ -22,20 +22,14 @@ const int TS_ARRAY[128] = {
 const int SLEW_RATE_INCREMENT = 20;
 const int SLEW_RATE_WAIT = 20;
 
-//Slide constants
-const int SLIDE_MIN = 0;
-const int SLIDE_MAX = 1000;
-
-const int MOGO_MIN = 0;
-const int MOGO_MAX = 1000;
-
 //Claw constants
+const int CLAW_CLOSED = 400;
+const int CLAW_OPEN = 1000;
 
 //Lift constants
 const int LIFT_MAX = 3350;
 const int LIFT_MIN = 270;
-const int LIFT_THRESHOLD = 1100;
 const int LIFT_TOLERANCE = 250;
 const float LIFT_SLOW_UP = 0.5;
 const float LIFT_SLOW_DOWN = 0.3;
-const int SLEW_RATE_INCREMENT_LIFT = 255;
+const int LIFT_HOLD = 15;

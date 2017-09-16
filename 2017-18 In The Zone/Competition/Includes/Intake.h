@@ -5,10 +5,22 @@
 
 //Stores previous toggle state to prevent accidental rapid switching
 int previousToggle = 0;
+ int state = 0;
 
-void setClaw(int state)
+void setClaw()
 {
-	SensorValue[ClawPiston] = state;
+	if(state == 0)
+	{
+		motor[ClawM] = 127;
+		waitUntil(SensorValue[ClawPot] >= CLAW_CLOSED || OverrideBtn);
+		motor[ClawM] = 0;
+	}
+	else
+	{
+		motor[ClawM] = -127;
+		waitUntil(SensorValue[ClawPot] <= CLAW_OPEN || OverrideBtn);
+		motor[ClawM] = 0;
+	}
 }
 
 /*
@@ -21,49 +33,16 @@ void driverClawControl(int toggle = 0)
 {
 	if(toggle == 1 && previousToggle == 0)
 	{
-		setClaw(1 - SensorValue[ClawPiston]);
+		state = (1-state);
+		setClaw();
 	}
 	previousToggle = toggle;
 }
 
-void driverSlideControl(float adjustDir, int autoAdjust = 0)
-{
-	if(autoAdjust == 1)
-	{
-		motor[SlideM] = 127;
-		waitUntil(SensorValue[SlideEnc] >= SLIDE_MAX || globalOverride);
-		motor[SlideM] = 0;
-	}
-	else if (autoAdjust == -1)
-	{
-		motor[SlideM] = -127;
-		waitUntil(SensorValue[SlideEnc] <= SLIDE_MIN || globalOverride);
-		motor[SlideM] = 0;
-	}
-	else
-	{
-		motor[SlideM] = adjustDir * 127;
-	}
-}
 
-void driverMogoControl(float adjustDir, int autoAdjust = 0)
+void driverMogoControl(int adjustDir)
 {
-	if(autoAdjust == 1)
-	{
-		motor[MogoM] = 127;
-		waitUntil(SensorValue[MogoEnc] >= MOGO_MAX || globalOverride);
-		motor[MogoM] = 0;
-	}
-	else if (autoAdjust == -1)
-	{
-		motor[MogoM] = -127;
-		waitUntil(SensorValue[MogoEnc] <= MOGO_MIN || globalOverride);
-		motor[MogoM] = 0;
-	}
-	else
-	{
-		motor[MogoM] = adjustDir * 127;
-	}
+	motor[MogoM] = adjustDir * 127;
 }
 
 /*
@@ -78,20 +57,11 @@ task intake()
 	}
 }
 
-task slide()
-{
-	while(true)
-	{
-		driverSlideControl(SlideUp - SlideDown, SlideAutoUp - SlideAutoDown);
-		EndTimeSlice();
-	}
-}
-
 task mogo()
 {
 	while(true)
 	{
-		driverMogoControl(MogoIn - MogoOut, MogoAutoIn - MogoAutoOut);
+		driverMogoControl(MogoIn - MogoOut);
 		EndTimeSlice();
 	}
 }
