@@ -5,23 +5,7 @@
 
 //Stores previous toggle state to prevent accidental rapid switching
 int previousToggle = 0;
- int state = 0;
-
-void setClaw()
-{
-	if(state == 0)
-	{
-		motor[ClawM] = 127;
-		waitUntil(SensorValue[ClawPot] >= CLAW_CLOSED || OverrideBtn);
-		motor[ClawM] = 0;
-	}
-	else
-	{
-		motor[ClawM] = -127;
-		waitUntil(SensorValue[ClawPot] <= CLAW_OPEN || OverrideBtn);
-		motor[ClawM] = 0;
-	}
-}
+int intakeToggle = 0;
 
 /*
 Function that controls the opening and closing of the claw intake.
@@ -29,21 +13,20 @@ Takes the following inputs:
 - @toggle			: The input toggle between open and closed
 Has no outputs.
 */
-void driverClawControl(int toggle = 0)
+
+void driverClawControl(int toggle)
 {
-	if(toggle == 1 && previousToggle == 0)
+	if(toggle == 1 && previousToggle == 0) //Ensure that this isn't a repeat toggle
 	{
-		state = (1-state);
-		setClaw();
+		motor[Claw] = (motor[Claw] == CLAW_CLOSED) ? CLAW_OPEN : CLAW_CLOSED; //Set claw to OPEN if CLOSED and vice versa
 	}
 	previousToggle = toggle;
 }
 
-
-void driverMogoControl(int adjustDir)
-{
-	motor[MogoM] = adjustDir * 127;
-}
+//void driverMogoControl(int adjustDir)
+//{
+//	motor[MogoM] = adjustDir * 127;
+//}
 
 /*
 Task that controls intaking.
@@ -52,12 +35,12 @@ task intake()
 {
 	while(true)
 	{
-		driverClawControl(ClawToggle);
+		driverClawControl(VexRT[btn8u]);
 		EndTimeSlice();
 	}
 }
 
-task mogo()
+task mobile_goal()
 {
 	while(true)
 	{

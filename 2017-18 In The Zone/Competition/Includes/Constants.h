@@ -23,8 +23,18 @@ const int SLEW_RATE_INCREMENT = 20;
 const int SLEW_RATE_WAIT = 20;
 
 //Claw constants
-const int CLAW_CLOSED = 400;
-const int CLAW_OPEN = 1000;
+const int CLAW_CLOSED = 50;
+const int CLAW_OPEN = 110;
+
+//Mobile Goal constants
+const int MOGO_IN = 1300;
+const int MOGO_OUT = 3200;
+const int MOGO_MID = 2000;
+
+//Cone Intake constants
+const int CONE_DOWN = 3400;
+const int CONE_MID = 2200;
+const int CONE_TOP = 650;
 
 //Lift constants
 const int LIFT_MAX = 3350;
@@ -32,4 +42,4 @@ const int LIFT_MIN = 270;
 const int LIFT_TOLERANCE = 250;
 const float LIFT_SLOW_UP = 0.5;
 const float LIFT_SLOW_DOWN = 0.3;
-const int LIFT_HOLD = 15;
+const int LIFT_HOLD = 0;
