@@ -48,7 +48,7 @@ void pre_auton()
 {
 	configBase();
 	configLift();
-	//configLCD();
+	configLCD();
 	bStopTasksBetweenModes = false;
 }
 
