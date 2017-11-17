@@ -1,62 +1,71 @@
-pos_PID vbarPID;
-int kPVbar = 1;
-int kIVbar = 0;
-int kDVbar = 0;
-
-void configVbar()
-{
-	pos_PID_InitController(&vbarPID, VbarPot, kPVbar, kIVbar, kDVbar);
-}
-
-bool vbarReached()
-{
-	return abs(pos_PID_GetError(&vbarPID)) < VBAR_FUZZY;
-}
-
 task driverVbarTask()
 {
-	int vbarPIDTarget = SensorValue[VbarPot];
 	while(true)
 	{
-		switch(asVbar)
+		int driverVbarAdjust = VBAR_UP_BTN - VBAR_DOWN_BTN;
+		if(driverVbarAdjust != 0)
 		{
-		case AS_VBAR_REST:
-			if(VBAR_UP_BTN == 1)
-			{
-				vbarPIDTarget = VBAR_UP;
-			}
-			else if(VBAR_DOWN_BTN == 1)
-			{
-				vbarPIDTarget = VBAR_DOWN;
-			}
-			else if(VBAR_STAGO_BTN == 1)
-			{
-				vbarPIDTarget = VBAR_STAGO;
-			}
-			break;
-		case AS_VBAR_START:
-			vbarPIDTarget = VBAR_UP;
-			if(vbarReached())
-			{
-				asVbar = AS_VBAR_STACK;
-			}
-			break;
-		case AS_VBAR_STACK:
-			vbarPIDTarget = VBAR_DOWN;
-			if(SensorValue[VbarPot] > VBAR_SAFE)
-			{
-				asVbar = AS_VBAR_SAFE;
-			}
-			break;
-		case AS_VBAR_SAFE:
-			if(vbarReached())
-			{
-				asVbar = AS_VBAR_REST;
-			}
-			break;
+			motor[VbarM] = 127 * driverVbarAdjust;
 		}
-		pos_PID_SetTargetPosition(&vbarPID, vbarPIDTarget);
-		motor[VbarM] = pos_PID_StepController(&vbarPID);
+		else if(abs(SensorValue[VbarPot] - VBAR_DOWN) < VBAR_THRESHOLD)
+		{
+			motor[VbarM] = -VBAR_HOLD;
+		}
+		else
+		{
+			motor[VbarM] = 0;
+		}
+		EndTimeSlice();
+	}
+}
+
+int autonVbarRequested = SensorValue[VbarPot];
+int autonVbarActual = autonVbarRequested;
+
+void vbarUp(int target)
+{
+	motor[VbarM] = 127;
+	waitUntil(SensorValue[VbarPot] > target);
+	motor[VbarM] = 0;
+}
+
+void vbarDown(int target)
+{
+	motor[VbarM] = -127;
+	waitUntil(SensorValue[VbarPot] < target);
+	motor[VbarM] = 0;
+}
+
+void autonVbarMove(int target, bool block = false)
+{
+	autonVbarRequested = target;
+	waitUntil(!block || autonVbarActual == target);
+}
+
+void autonVbarUp(int target = VBAR_UP, bool block = false)
+{
+	autonVbarMove(target, block);
+}
+
+void autonVbarDown(int target = VBAR_DOWN, bool block = false)
+{
+	autonVbarMove(target, block);
+}
+
+task autonVbarTask()
+{
+	while(true)
+	{
+		if(autonVbarRequested > autonVbarActual)
+		{
+			vbarUp(autonVbarRequested);
+			autonVbarActual = autonVbarRequested;
+		}
+		if(autonVbarRequested < autonVbarActual)
+		{
+			vbarDown(autonVbarRequested);
+			autonVbarActual = autonVbarRequested;
+		}
 		EndTimeSlice();
 	}
 }

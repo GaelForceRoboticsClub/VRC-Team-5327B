@@ -1,43 +1,56 @@
 #define CLAW_OPEN 0
 #define CLAW_CLOSED 1
 
+void clawOperate(int direction)
+{
+	motor[ClawM] = 127 * direction;
+	wait1Msec(CLAW_MOVE_DURATION);
+	motor[ClawM] = CLAW_HOLD * direction;
+}
+
 task driverClawTask()
 {
-	int previousToggle = 0;
-	//This might cause spooky stuff if auton goes weird
-	int clawTarget = CLAW_CLOSED;
-	int clawCurrent = CLAW_CLOSED;
+	int intakeToggle = 1;
 	while(true)
 	{
-		switch(asClaw)
+		if(CLAW_TOGGLE_BTN == 1)
 		{
-		case AS_CLAW_REST:
-			int driverInput = CLAW_TOGGLE_BTN;
-			if(driverInput - previousToggle == 1)
-			{
-				clawTarget = (clawTarget == CLAW_CLOSED) ? CLAW_OPEN : CLAW_CLOSED;
-			}
-			previousToggle = driverInput;
-			break;
-		case AS_CLAW_START:
-			break;
-		case AS_CLAW_RELEASE:
-			clawTarget = CLAW_CLOSED;
-			break;
+			intakeToggle *= -1;
+			clawOperate(intakeToggle);
+			waitUntil(CLAW_TOGGLE_BTN == 0);
 		}
-		if(clawTarget == CLAW_CLOSED && clawCurrent == CLAW_OPEN)
+		EndTimeSlice();
+	}
+}
+
+int autonClawRequested = CLAW_CLOSED;
+int autonClawActual = CLAW_CLOSED;
+
+void autonClawClose(bool block = false)
+{
+	autonClawRequested = CLAW_CLOSED;
+	waitUntil(!block || autonClawActual == CLAW_CLOSED);
+}
+
+void autonClawOpen(bool block = false)
+{
+	autonClawRequested = CLAW_OPEN;
+	waitUntil(!block || autonClawActual == CLAW_OPEN);
+}
+
+task autonClawTask()
+{
+	while(true)
+	{
+		if(autonClawRequested == CLAW_CLOSED && autonClawActual == CLAW_OPEN)
 		{
-			motor[ClawM] = 127;
-			wait1Msec(CLAW_MOVE_DURATION);
-			motor[ClawM] = 0;
-			clawCurrent = CLAW_CLOSED;
+			clawOperate(1);
+			autonClawActual = autonClawRequested;
 		}
-		else if(clawTarget == CLAW_OPEN && clawCurrent == CLAW_CLOSED)
+		else if(autonClawRequested == CLAW_OPEN && autonClawActual == CLAW_CLOSED)
 		{
-			motor[ClawM] = -127;
-			wait1Msec(CLAW_MOVE_DURATION);
-			motor[ClawM] = -CLAW_HOLD;
-			clawCurrent = CLAW_OPEN;
+			clawOperate(-1);
+			autonClawActual = autonClawRequested;
 		}
 		EndTimeSlice();
 	}

@@ -35,7 +35,6 @@
 //Custom includes below
 #include "Includes/Constants.h"
 #include "Includes/JoystickDefs.h"
-#include "Includes/Autostack.h"
 #include "Includes/Base.h"
 #include "Includes/Lift.h"
 #include "Includes/Claw.h"
@@ -47,18 +46,20 @@
 void pre_auton()
 {
 	configBase();
-	configLift();
 	configLCD();
 	bStopTasksBetweenModes = false;
 }
 
 task autonomous()
 {
+	startTask(autonLiftTask);
+	startTask(autonVbarTask);
+	startTask(autonClawTask);
+	startTask(autonMogoTask);
 }
 
 task usercontrol()
 {
-	startTask(driverAutostackTask);
 	startTask(driverBaseTask);
 	startTask(driverLiftTask);
 	startTask(driverVbarTask);
