@@ -41,6 +41,7 @@
 #include "Includes/Mogo.h"
 #include "Includes/Vertibar.h"
 #include "Includes/LCD.h"
+#include "Includes/AutonRoutines.h"
 //Custom includes above
 
 void pre_auton()

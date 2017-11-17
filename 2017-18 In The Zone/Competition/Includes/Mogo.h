@@ -1,31 +1,8 @@
-void mogoIn()
-{
-	motor[MogoM] = -127;
-	waitUntil(SensorValue[MogoPot] < MOGO_IN);
-	motor[MogoM] = 0;
-}
-
-void mogoOut()
-{
-	motor[MogoM] = 127;
-	waitUntil(SensorValue[MogoPot] > MOGO_OUT);
-	motor[MogoM] = 0;
-}
-
 task driverMogoTask()
 {
 	while(true)
 	{
-		if(MOGO_IN_BTN == 1)
-		{
-			mogoIn();
-			waitUntil(MOGO_IN_BTN == 0);
-		}
-		else if(MOGO_OUT_BTN == 1)
-		{
-			mogoOut();
-			waitUntil(MOGO_OUT_BTN == 0);
-		}
+		motor[MogoM] = 127 * (MOGO_IN_BTN - MOGO_OUT_BTN);
 		EndTimeSlice();
 	}
 }
@@ -33,30 +10,48 @@ task driverMogoTask()
 int autonMogoRequested = MOGO_IN;
 int autonMogoActual = MOGO_IN;
 
-void autonMogoOut(bool block = false)
+void mogoIn(int target)
 {
-	autonMogoRequested = MOGO_OUT;
-	waitUntil(!block || autonMogoActual == MOGO_OUT);
+	motor[MogoM] = 127;
+	waitUntil(SensorValue[MogoPot] > target);
+	motor[MogoM] = 0;
 }
 
-void autonMogoIn(bool block = false)
+void mogoOut(int target)
 {
-	autonMogoRequested = MOGO_IN;
-	waitUntil(!block || autonMogoActual == MOGO_IN);
+	motor[MogoM] = -127;
+	waitUntil(SensorValue[MogoPot] < target);
+	motor[MogoM] = 0;
+}
+
+void autonMogoMove(int target, bool block = false)
+{
+	autonMogoRequested = target;
+	waitUntil(!block || autonMogoActual == target);
+}
+
+void autonMogoIn(int target = MOGO_IN, bool block = false)
+{
+	autonMogoMove(target, block);
+}
+
+void autonMogoOut(int target = MOGO_OUT, bool block = false)
+{
+	autonMogoMove(target, block);
 }
 
 task autonMogoTask()
 {
 	while(true)
 	{
-		if(autonMogoRequested == MOGO_IN && autonMogoActual == MOGO_OUT)
+		if(autonMogoRequested > autonMogoActual)
 		{
-			mogoIn();
+			mogoIn(autonMogoRequested);
 			autonMogoActual = autonMogoRequested;
 		}
-		else if(autonMogoRequested == MOGO_OUT && autonMogoActual == MOGO_IN)
+		else if(autonMogoRequested < autonMogoActual)
 		{
-			mogoOut();
+			mogoOut(autonMogoRequested);
 			autonMogoActual = autonMogoRequested;
 		}
 		EndTimeSlice();

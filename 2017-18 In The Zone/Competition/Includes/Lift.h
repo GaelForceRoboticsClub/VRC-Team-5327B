@@ -61,10 +61,14 @@ task autonLiftTask()
 			liftUp(autonLiftRequested);
 			autonLiftActual = autonLiftRequested;
 		}
-		if(autonLiftRequested < autonLiftActual)
+		else if(autonLiftRequested < autonLiftActual)
 		{
 			liftDown(autonLiftRequested);
 			autonLiftActual = autonLiftRequested;
+		}
+		if(abs(SensorValue[LiftPot] - LIFT_MIN) < LIFT_THRESHOLD)
+		{
+			motor[LiftM] = -LIFT_HOLD;
 		}
 		EndTimeSlice();
 	}

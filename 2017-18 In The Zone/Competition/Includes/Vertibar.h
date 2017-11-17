@@ -61,10 +61,14 @@ task autonVbarTask()
 			vbarUp(autonVbarRequested);
 			autonVbarActual = autonVbarRequested;
 		}
-		if(autonVbarRequested < autonVbarActual)
+		else if(autonVbarRequested < autonVbarActual)
 		{
 			vbarDown(autonVbarRequested);
 			autonVbarActual = autonVbarRequested;
+		}
+		if(abs(SensorValue[VbarPot] - VBAR_DOWN) < VBAR_THRESHOLD)
+		{
+			motor[VbarM] = -VBAR_HOLD;
 		}
 		EndTimeSlice();
 	}
