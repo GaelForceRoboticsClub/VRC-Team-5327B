@@ -2,9 +2,15 @@ void configBase()
 {
 	slaveMotor(RMBBase, RFBase);
 	slaveMotor(LMBBase, LFBase);
-	addMotor(RFBase, 127);
-	addMotor(LFBase, 127);
+	addMotor(RFBase);
+	addMotor(LFBase);
 	startTask(motorSlewRateTask);
+}
+
+void baseResetSlew()
+{
+	setMotorSlew(RFBase, 127);
+	setMotorSlew(LFBase, 127);
 }
 
 task driverBaseTask()

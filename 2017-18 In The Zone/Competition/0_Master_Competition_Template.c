@@ -48,6 +48,7 @@ void pre_auton()
 {
 	configBase();
 	configLCD();
+	motor[ClawM] = -25;
 	bStopTasksBetweenModes = false;
 }
 
@@ -57,13 +58,13 @@ task autonomous()
 	startTask(autonVbarTask);
 	startTask(autonClawTask);
 	startTask(autonMogoTask);
-	aFd(30, 30, 450);
+	a2Cone20Pt();
 	playTone(600, 10);
-	wait1Msec(5000);
 }
 
 task usercontrol()
 {
+	baseResetSlew();
 	startTask(driverBaseTask);
 	startTask(driverLiftTask);
 	startTask(driverVbarTask);
