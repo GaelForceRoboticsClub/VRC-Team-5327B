@@ -1,28 +1,59 @@
-pos_PID mogoPID;
-int kPMogo = 1;
-int kIMogo = 0;
-int kDMogo = 0;
-
-void configMogo()
-{
-	pos_PID_InitController(&mogoPID, MogoPot, kPMogo, kIMogo, kDMogo);
-}
-
 task driverMogoTask()
 {
-	int mogoPIDTarget = SensorValue[MogoPot];
 	while(true)
 	{
-		if(MOGO_IN_BTN == 1)
+		motor[MogoM] = 127 * (MOGO_IN_BTN - MOGO_OUT_BTN);
+		EndTimeSlice();
+	}
+}
+
+int autonMogoRequested = MOGO_IN;
+int autonMogoActual = MOGO_IN;
+
+void mogoIn(int target)
+{
+	motor[MogoM] = 127;
+	waitUntil(SensorValue[MogoPot] > target);
+	motor[MogoM] = 0;
+}
+
+void mogoOut(int target)
+{
+	motor[MogoM] = -127;
+	waitUntil(SensorValue[MogoPot] < target);
+	motor[MogoM] = 0;
+}
+
+void autonMogoMove(int target, bool block = false)
+{
+	autonMogoRequested = target;
+	waitUntil(!block || autonMogoActual == target);
+}
+
+void autonMogoIn(int target = MOGO_IN, bool block = false)
+{
+	autonMogoMove(target, block);
+}
+
+void autonMogoOut(int target = MOGO_OUT, bool block = false)
+{
+	autonMogoMove(target, block);
+}
+
+task autonMogoTask()
+{
+	while(true)
+	{
+		if(autonMogoRequested > autonMogoActual)
 		{
-			mogoPIDTarget = MOGO_IN;
+			mogoIn(autonMogoRequested);
+			autonMogoActual = autonMogoRequested;
 		}
-		else if(MOGO_OUT_BTN == 1)
+		else if(autonMogoRequested < autonMogoActual)
 		{
-			mogoPIDTarget = MOGO_OUT;
+			mogoOut(autonMogoRequested);
+			autonMogoActual = autonMogoRequested;
 		}
-		pos_PID_SetTargetPosition(&mogoPID, mogoPIDTarget);
-		motor[MogoM] = pos_PID_StepController(&mogoPID);
 		EndTimeSlice();
 	}
 }

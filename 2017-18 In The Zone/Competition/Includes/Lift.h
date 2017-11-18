@@ -1,42 +1,75 @@
-pos_PID liftPID;
-int kPLift = 1;
-int kILift = 0;
-int kDLift = 0;
-
-void configLift()
-{
-	pos_PID_InitController(&liftPID, LiftPot, kPLift, kILift, kDLift);
-}
-
-bool liftReached()
-{
-	return abs(pos_PID_GetError(&liftPID)) < LIFT_FUZZY;
-}
-
 task driverLiftTask()
 {
-	int liftPIDTarget = SensorValue[LiftPot];
 	while(true)
 	{
-		switch(asLift)
+		int driverLiftAdjust = LIFT_UP_BTN - LIFT_DOWN_BTN;
+		if(driverLiftAdjust != 0)
 		{
-		case AS_LIFT_REST:
-			float driverInput = LIFT_UP_BTN + LIFT_UP_SLOW_BTN - LIFT_DOWN_BTN - LIFT_DOWN_SLOW_BTN;
-			liftPIDTarget += LIFT_DRIVER_INCREMENT * driverInput;
-			break;
-		case AS_LIFT_START:
-			break;
-		case AS_LIFT_DOWN:
-			liftPIDTarget = LIFT_MIN;
-			if(liftReached())
-			{
-				asLift = AS_LIFT_REST;
-			}
-			break;
+			motor[LiftM] = 127 * driverLiftAdjust;
 		}
+		else if(abs(SensorValue[LiftPot] - LIFT_MIN) < LIFT_THRESHOLD)
+		{
+			motor[LiftM] = -LIFT_HOLD;
+		}
+		else
+		{
+			motor[LiftM] = 0;
+		}
+		EndTimeSlice();
+	}
+}
 
-		pos_PID_SetTargetPosition(&liftPID, liftPIDTarget);
-		motor[LiftM] = pos_PID_StepController(&liftPID);
+int autonLiftRequested = SensorValue[LiftPot];
+int autonLiftActual = autonLiftRequested;
+
+void liftUp(int target)
+{
+	motor[LiftM] = 127;
+	waitUntil(SensorValue[LiftPot] > target);
+	motor[LiftM] = 0;
+}
+
+void liftDown(int target)
+{
+	motor[LiftM] = -127;
+	waitUntil(SensorValue[LiftPot] < target);
+	motor[LiftM] = 0;
+}
+
+void autonLiftMove(int target, bool block = false)
+{
+	autonLiftRequested = target;
+	waitUntil(!block || autonLiftActual == target);
+}
+
+void autonLiftUp(int target = LIFT_MAX, bool block = false)
+{
+	autonLiftMove(target, block);
+}
+
+void autonLiftDown(int target = LIFT_MIN, bool block = false)
+{
+	autonLiftMove(target, block);
+}
+
+task autonLiftTask()
+{
+	while(true)
+	{
+		if(autonLiftRequested > autonLiftActual)
+		{
+			liftUp(autonLiftRequested);
+			autonLiftActual = autonLiftRequested;
+		}
+		else if(autonLiftRequested < autonLiftActual)
+		{
+			liftDown(autonLiftRequested);
+			autonLiftActual = autonLiftRequested;
+		}
+		if(abs(SensorValue[LiftPot] - LIFT_MIN) < LIFT_THRESHOLD)
+		{
+			motor[LiftM] = -LIFT_HOLD;
+		}
 		EndTimeSlice();
 	}
 }
