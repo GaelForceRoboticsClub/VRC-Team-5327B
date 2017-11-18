@@ -25,14 +25,14 @@ int autonVbarActual = autonVbarRequested;
 void vbarUp(int target)
 {
 	motor[VbarM] = 127;
-	waitUntil(SensorValue[VbarPot] > target);
+	waitUntil(SensorValue[VbarPot] <= target);
 	motor[VbarM] = 0;
 }
 
 void vbarDown(int target)
 {
 	motor[VbarM] = -127;
-	waitUntil(SensorValue[VbarPot] < target);
+	waitUntil(SensorValue[VbarPot] >= target);
 	motor[VbarM] = 0;
 }
 
@@ -47,21 +47,31 @@ void autonVbarUp(int target = VBAR_UP, bool block = false)
 	autonVbarMove(target, block);
 }
 
+void autonVbarUp(bool block)
+{
+	autonVbarUp(VBAR_UP, block);
+}
+
 void autonVbarDown(int target = VBAR_DOWN, bool block = false)
 {
 	autonVbarMove(target, block);
+}
+
+void autonVbarDown(bool block)
+{
+	autonVbarDown(VBAR_DOWN, block);
 }
 
 task autonVbarTask()
 {
 	while(true)
 	{
-		if(autonVbarRequested > autonVbarActual)
+		if(autonVbarRequested < autonVbarActual)
 		{
 			vbarUp(autonVbarRequested);
 			autonVbarActual = autonVbarRequested;
 		}
-		else if(autonVbarRequested < autonVbarActual)
+		else if(autonVbarRequested > autonVbarActual)
 		{
 			vbarDown(autonVbarRequested);
 			autonVbarActual = autonVbarRequested;

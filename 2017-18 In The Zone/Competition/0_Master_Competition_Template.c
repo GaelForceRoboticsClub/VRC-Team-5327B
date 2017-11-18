@@ -1,4 +1,4 @@
-#pragma config(UART_Usage, UART1, uartVEXLCD, baudRate19200, IOPins, None, None)
+ #pragma config(UART_Usage, UART1, uartVEXLCD, baudRate19200, IOPins, None, None)
 #pragma config(UART_Usage, UART2, uartNotUsed, baudRate4800, IOPins, None, None)
 #pragma config(Sensor, in1,    VbarPot,        sensorPotentiometer)
 #pragma config(Sensor, in2,    LiftPot,        sensorPotentiometer)
@@ -7,8 +7,8 @@
 #pragma config(Sensor, dgtl11, RBaseEnc,       sensorQuadEncoder)
 #pragma config(Motor,  port2,           LFBase,        tmotorVex393_MC29, openLoop, driveRight, encoderPort, dgtl1)
 #pragma config(Motor,  port3,           RFBase,        tmotorVex393_MC29, openLoop, driveLeft)
-#pragma config(Motor,  port4,           LiftM,         tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port5,           VbarM,         tmotorVex393_MC29, openLoop, reversed)
+#pragma config(Motor,  port4,           LiftM,         tmotorVex393_MC29, openLoop, reversed)
+#pragma config(Motor,  port5,           VbarM,         tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port6,           LMBBase,       tmotorVex393_MC29, openLoop, driveRight, encoderPort, None)
 #pragma config(Motor,  port7,           RMBBase,       tmotorVex393_MC29, openLoop, driveLeft)
 #pragma config(Motor,  port8,           MogoM,         tmotorVex393_MC29, openLoop)
@@ -57,6 +57,9 @@ task autonomous()
 	startTask(autonVbarTask);
 	startTask(autonClawTask);
 	startTask(autonMogoTask);
+	aFd(30, 30, 450);
+	playTone(600, 10);
+	wait1Msec(5000);
 }
 
 task usercontrol()

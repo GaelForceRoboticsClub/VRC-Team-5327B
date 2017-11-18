@@ -2,8 +2,8 @@ void configBase()
 {
 	slaveMotor(RMBBase, RFBase);
 	slaveMotor(LMBBase, LFBase);
-	addMotor(RFBase);
-	addMotor(LFBase);
+	addMotor(RFBase, 127);
+	addMotor(LFBase, 127);
 	startTask(motorSlewRateTask);
 }
 

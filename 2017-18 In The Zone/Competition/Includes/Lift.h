@@ -47,9 +47,19 @@ void autonLiftUp(int target = LIFT_MAX, bool block = false)
 	autonLiftMove(target, block);
 }
 
+void autonLiftUp(bool block)
+{
+	autonLiftUp(LIFT_MAX, block);
+}
+
 void autonLiftDown(int target = LIFT_MIN, bool block = false)
 {
 	autonLiftMove(target, block);
+}
+
+void autonLiftDown(bool block)
+{
+	autonLiftDown(LIFT_MIN, block);
 }
 
 task autonLiftTask()

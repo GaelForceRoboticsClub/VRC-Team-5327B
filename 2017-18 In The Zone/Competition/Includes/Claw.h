@@ -44,12 +44,12 @@ task autonClawTask()
 	{
 		if(autonClawRequested == CLAW_CLOSED && autonClawActual == CLAW_OPEN)
 		{
-			clawOperate(1);
+			clawOperate(-1);
 			autonClawActual = autonClawRequested;
 		}
 		else if(autonClawRequested == CLAW_OPEN && autonClawActual == CLAW_CLOSED)
 		{
-			clawOperate(-1);
+			clawOperate(1);
 			autonClawActual = autonClawRequested;
 		}
 		EndTimeSlice();
