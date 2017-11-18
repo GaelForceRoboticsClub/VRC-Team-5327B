@@ -1,7 +1,7 @@
 pos_PID vbarPID;
 int kPVbar = 1;
 int kIVbar = 0;
-int kDVbar = 0;
+int kDVbar = 2;
 
 void configVbar()
 {
