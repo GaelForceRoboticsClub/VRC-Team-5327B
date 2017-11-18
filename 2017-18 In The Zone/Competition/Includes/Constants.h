@@ -12,7 +12,8 @@ const int VBAR_SAFE = 0;
 const int VBAR_THRESHOLD = 150;
 const int VBAR_HOLD = 15;
 
-const int CLAW_HOLD = 25;
+const int CLAW_HOLD_CLOSE = 35;
+const int CLAW_HOLD_OPEN = 15;
 const int CLAW_MOVE_DURATION = 120;
 
 const int MOGO_IN = 900;

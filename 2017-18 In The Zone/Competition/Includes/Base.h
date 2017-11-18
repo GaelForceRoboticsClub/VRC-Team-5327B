@@ -34,6 +34,7 @@ void aFd(int rPower, int lPower, int ticks, int timeout = 5000, bool brake = tru
 	if(time1[T1] > timeout)
 	{
 		playImmediateTone(750, 20);
+		stopTask(autonomous);
 	}
 	if(brake)
 	{
@@ -53,7 +54,8 @@ void aBk(int rPower, int lPower, int ticks, int timeout = 5000, bool brake = tru
 	if(time1[T1] > timeout)
 	{
 		playImmediateTone(750, 20);
-	}
+		stopTask(autonomous);
+		}
 	waitUntil(abs(SensorValue[RBaseEnc]) >= ticks);
 	if(brake)
 	{
@@ -73,7 +75,8 @@ void aTn(int rPower, int lPower, int ticks, int timeout = 5000, bool brake = tru
 	if(time1[T1] > timeout)
 	{
 		playImmediateTone(750, 20);
-	}
+		stopTask(autonomous);
+		}
 	if(rPower < lPower)
 	{
 		waitUntil(abs(SensorValue[LBaseEnc]) >= ticks);

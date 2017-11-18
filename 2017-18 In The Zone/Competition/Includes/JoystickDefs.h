@@ -16,3 +16,6 @@
 #define MOGO_OUT_BTN vexRT[Btn7U]
 
 #define AS_BTN 0
+
+#define JOHN_SO_BTN vexRT[Btn7R]
+#define SOUND_CLEAR_BTN vexRT[Btn8L]

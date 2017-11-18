@@ -5,7 +5,15 @@ void clawOperate(int direction)
 {
 	motor[ClawM] = 127 * direction;
 	wait1Msec(CLAW_MOVE_DURATION);
-	motor[ClawM] = CLAW_HOLD * direction;
+	if(direction == -1)
+	{
+			motor[ClawM] = CLAW_HOLD_CLOSE * direction;
+	}
+	else if(direction == 1)
+	{
+		motor[ClawM] = CLAW_HOLD_OPEN * direction;
+	}
+
 }
 
 task driverClawTask()

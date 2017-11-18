@@ -1,4 +1,4 @@
- #pragma config(UART_Usage, UART1, uartVEXLCD, baudRate19200, IOPins, None, None)
+#pragma config(UART_Usage, UART1, uartVEXLCD, baudRate19200, IOPins, None, None)
 #pragma config(UART_Usage, UART2, uartNotUsed, baudRate4800, IOPins, None, None)
 #pragma config(Sensor, in1,    VbarPot,        sensorPotentiometer)
 #pragma config(Sensor, in2,    LiftPot,        sensorPotentiometer)
@@ -42,23 +42,26 @@
 #include "Includes/Vertibar.h"
 #include "Includes/LCD.h"
 #include "Includes/AutonRoutines.h"
+#include "Includes/SFX.h"
 //Custom includes above
 
 void pre_auton()
 {
 	configBase();
 	configLCD();
-	motor[ClawM] = -25;
-	bStopTasksBetweenModes = false;
+	motor[ClawM] = -CLAW_HOLD_CLOSE;
+	bStopTasksBetweenModes = true;
+	playSoundFile("WindowsXP.wav");
 }
 
 task autonomous()
 {
+	//playSoundFile("Autobots.wav");
 	startTask(autonLiftTask);
 	startTask(autonVbarTask);
 	startTask(autonClawTask);
 	startTask(autonMogoTask);
-	a2Cone20Pt();
+	aStagoThenLeft();
 	playTone(600, 10);
 }
 
@@ -70,6 +73,7 @@ task usercontrol()
 	startTask(driverVbarTask);
 	startTask(driverClawTask);
 	startTask(driverMogoTask);
+	startTask(driverSFXTask);
 	while(true)
 	{
 		EndTimeSlice();
