@@ -1,124 +1,30 @@
-void configBase()
-{
-	slaveMotor(RMBBase, RFBase);
-	slaveMotor(LMBBase, LFBase);
-	addMotor(RFBase);
-	addMotor(LFBase);
-	startTask(motorSlewRateTask);
-}
-
 task driverBaseTask()
 {
 	while(true)
 	{
-		sm(RFBase, R_JOY);
-		sm(LFBase, L_JOY);
+		motor[RBase] = R_JOY;
+		motor[LBase] = L_JOY;
+		int mogoAdjust = MOGO_OUT_BTN - MOGO_IN_BTN;
+		if(mogoAdjust == 0)
+		{
+			motor[LFDMD] = L_JOY;
+			motor[LBDMD] = -L_JOY;
+			motor[RFDMD] = -R_JOY;
+			motor[RBDMD] = R_JOY;
+		}
+		else
+		{
+			motor[LFDMD] = -127 * mogoAdjust;
+			motor[LBDMD] = 127 * mogoAdjust;
+			motor[RFDMD] = 127 * mogoAdjust;
+			motor[RBDMD] = -127 * mogoAdjust;
+		}
+		//Sorry I'm a rebel, this code still exists but commented out. If my above if-else loop fails, just comment that out instead.
+
+		/*motor[LBDMD] = (-L_JOY * (1 - vexRT[Btn8D]) * (1 - vexRT[Btn8U])) + 127 * (vexRT[Btn8U] - vexRT[Btn8D]);
+		motor[RBDMD] = (R_JOY * (1 - vexRT[Btn8D]) * (1 - vexRT[Btn8U])) - 127 * (vexRT[Btn8U] - vexRT[Btn8D]);
+		motor[LFDMD] = (L_JOY * (1 - vexRT[Btn8U]) * (1 - vexRT[Btn8D])) - 127 * (vexRT[Btn8D] - vexRT[Btn8U]);
+		motor[RFDMD] = (-R_JOY * (1 - vexRT[Btn8U]) * (1 - vexRT[Btn8D])) + 127 * (vexRT[Btn8D] - vexRT[Btn8U]);*/
 		EndTimeSlice();
 	}
 }
-
-void aFd(int rPower, int lPower, int ticks, int timeout = 5000, bool brake = true)
-{
-	sm(RFBase, abs(rPower));
-	sm(LFBase, abs(lPower));
-	SensorValue[RBaseEnc] = 0;
-	SensorValue[LBaseEnc] = 0;
-	clearTimer(T1);
-	waitUntil(abs(SensorValue[RBaseEnc]) >= ticks || time1[T1] > timeout);
-	if(time1[T1] > timeout)
-	{
-		playImmediateTone(750, 20);
-	}
-	if(brake)
-	{
-		sm(RFBase, 0);
-		sm(LFBase, 0);
-	}
-}
-
-void aBk(int rPower, int lPower, int ticks, int timeout = 5000, bool brake = true)
-{
-	sm(RFBase, -abs(rPower));
-	sm(LFBase, -abs(lPower));
-	SensorValue[RBaseEnc] = 0;
-	SensorValue[LBaseEnc] = 0;
-	clearTimer(T1);
-	waitUntil(abs(SensorValue[RBaseEnc]) >= ticks || time1[T1] > timeout);
-	if(time1[T1] > timeout)
-	{
-		playImmediateTone(750, 20);
-	}
-	waitUntil(abs(SensorValue[RBaseEnc]) >= ticks);
-	if(brake)
-	{
-		sm(RFBase, 0);
-		sm(LFBase, 0);
-	}
-}
-
-void aTn(int rPower, int lPower, int ticks, int timeout = 5000, bool brake = true)
-{
-	sm(RFBase, rPower);
-	sm(LFBase, lPower);
-	SensorValue[RBaseEnc] = 0;
-	SensorValue[LBaseEnc] = 0;
-	clearTimer(T1);
-	waitUntil(abs(SensorValue[RBaseEnc]) >= ticks || time1[T1] > timeout);
-	if(time1[T1] > timeout)
-	{
-		playImmediateTone(750, 20);
-	}
-	if(rPower < lPower)
-	{
-		waitUntil(abs(SensorValue[LBaseEnc]) >= ticks);
-	}
-	else
-	{
-		waitUntil(abs(SensorValue[RBaseEnc]) >= ticks);
-	}
-	if(brake)
-	{
-		sm(RFBase, 0);
-		sm(LFBase, 0);
-	}
-}
-
-
-//int autonRBaseSpeed = 0;
-//int autonLBaseSpeed = 0;
-//int autonRBaseTarget = 0;
-//int autonLBaseTarget = 0;
-//bool autonBaseReached = true;
-
-//void autonDrive(int rPower, int lPower, int tickCount, bool block = false)
-//{
-//	waitUntil(autonBaseReached);
-//	autonBaseReached = false;
-//	autonRBaseSpeed = rPower;
-//	autonLBaseSpeed = lPower;
-//	if(rPower < lPower)
-//	{
-//		autonLBaseTarget = tickCount;
-//	}
-//	else
-//	{
-//		autonRBaseTarget = tickCount;
-//	}
-//	waitUntil(!block || autonBaseReached);
-//}
-
-//task autonBaseTask()
-//{
-//	while(true)
-//	{
-//		if(!autonBaseReached)
-//		{
-//			SensorValue[RBaseEnc] = 0;
-//			SensorValue[LBaseEnc] = 0;
-//			motor[RBase] = rPower;
-//			motor[LBbase] = lpower;
-//			waitUntil(abs(SensorValue[RBaseEnc]) >= autonRBaseTarget && abs(SensorValue[LBaseEnc]) >= autonLBaseTarget);
-//		}
-//		EndTimeSlice();
-//	}
-//}

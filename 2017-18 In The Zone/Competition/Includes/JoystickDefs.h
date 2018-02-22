@@ -8,11 +8,10 @@
 
 #define VBAR_DOWN_BTN 0
 #define VBAR_UP_BTN 0
-#define VBAR_STAGO_BTN 0
 
-#define CLAW_TOGGLE_BTN 0
+#define CLAW_RELEASE_BTN 0
 
 #define MOGO_IN_BTN 0
 #define MOGO_OUT_BTN 0
 
-#define AS_BTN 0
+#define BRAKE_TOGGLE_BTN 0

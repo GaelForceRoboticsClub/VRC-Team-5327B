@@ -2,7 +2,7 @@ menu *defaultMenu, *autonMenu, *sensorMenu, *batteryMenu;
 
 void configLCD()
 {
-	defaultMenu = lcd_newMenu("HOW'S MY DRIVING?", "1-800-GFR-5327B");
+	defaultMenu = lcd_newMenu("HOW'S MY DRIVING?");
 	autonMenu = lcd_newMenu("Autons");
 	sensorMenu = lcd_newMenu("Sensors");
 	batteryMenu = lcd_newMenu("Battery");
