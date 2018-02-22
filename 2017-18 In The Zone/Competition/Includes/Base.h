@@ -14,9 +14,9 @@ task driverBaseTask()
 		}
 		else
 		{
-			motor[LFDMD] = -127 * mogoAdjust;
+			motor[LFDMD] = 127 * mogoAdjust;
 			motor[LBDMD] = 127 * mogoAdjust;
-			motor[RFDMD] = 127 * mogoAdjust;
+			motor[RFDMD] = -127 * mogoAdjust;
 			motor[RBDMD] = -127 * mogoAdjust;
 		}
 		//Sorry I'm a rebel, this code still exists but commented out. If my above if-else loop fails, just comment that out instead.

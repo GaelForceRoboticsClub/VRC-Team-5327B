@@ -6,12 +6,12 @@
 #define LIFT_UP_SLOW_BTN 0
 #define LIFT_DOWN_SLOW_BTN 0
 
-#define VBAR_DOWN_BTN 0
-#define VBAR_UP_BTN 0
+#define VBAR_UP_BTN vexRT[JOY_TRIG_LU]
+#define VBAR_DOWN_BTN vexRT[JOY_TRIG_LD]
 
-#define CLAW_RELEASE_BTN 0
+#define CLAW_RELEASE_BTN vexRT[JOY_BTN_LU]
 
-#define MOGO_IN_BTN vexRT[Btn7D]
-#define MOGO_OUT_BTN vexRT[Btn7U]
+#define MOGO_OUT_BTN vexRT[JOY_BTN_RU]
+#define MOGO_IN_BTN vexRT[JOY_BTN_RD]
 
 #define BRAKE_TOGGLE_BTN 0
