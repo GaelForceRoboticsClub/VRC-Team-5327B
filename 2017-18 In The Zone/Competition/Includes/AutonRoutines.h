@@ -1,9 +1,11 @@
+//Initiates the proper flipout action at the start of autonomous
 void flipout()
 {
 	autonVbarUp(true);
 	autonLiftUp(LIFT_MIN + 200, true);
 }
 
+//Actuates the claw repeatedly to 'clap' for specified count
 void clap(int i)
 {
 	repeat(i)
@@ -102,8 +104,4 @@ void a2Cone5PtLeftWall()
 	autonMogoOut(true);
 	aBk(100, 100, 350);
 	wait1Msec(5000);
-}
-void a2cone5Pt()
-{
-	//Hopefully almost literally the same as the previous one
 }

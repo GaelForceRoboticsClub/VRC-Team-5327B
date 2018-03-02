@@ -48,11 +48,13 @@
 
 void pre_auton()
 {
+	//Ensure that tasks stop successfully
 	bStopTasksBetweenModes = false;
 }
 
 void startDriverTasks()
 {
+	//Enable all of the various drivermode tasks
 	startTask(driverClawTask);
 	startTask(driverVbarTask);
 	startTask(driverActuationMonitorTask);
@@ -63,13 +65,18 @@ void startDriverTasks()
 
 task autonomous()
 {
+	//Run specific autonomous mode code here
+	//a20pt1C();
 }
 
 task usercontrol()
 {
+	//Initiate the driver tasks for driver mode
 	startDriverTasks();
 	while(true)
 	{
+		//Keep this task running to avoid the competition switch
+		//from thinking we have disconnected
 		EndTimeSlice();
 	}
 }
