@@ -18,8 +18,9 @@
 #define CLAW_RELEASE_BTN vexRT[JOY_BTN_LU]
 
 //Mogo control
-#define MOGO_OUT_BTN vexRT[JOY_BTN_RU]
-#define MOGO_IN_BTN vexRT[JOY_BTN_RD]
+#define MOGO_OUT_ADJ_BTN vexRT[JOY_BTN_RU]
+#define MOGO_IN_ADJ_BTN vexRT[JOY_BTN_RD]
+#define MOGO_TOGGLE_BTN vexRT[JOY_BTN_RR]
 
 //Brake toggling
 #define BRAKE_TOGGLE_BTN vexRT[JOY_BTN_RL]

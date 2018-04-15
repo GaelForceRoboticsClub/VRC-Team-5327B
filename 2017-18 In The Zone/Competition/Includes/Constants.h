@@ -3,10 +3,13 @@
 //MODIFY WITH CAUTION!
 
 //These constants govern the lift's preset heights
-const int LIFT_MIN = 800;
-const int LIFT_MAX = 3500;
+const int LIFT_MIN = 1275;
+const int LIFT_MOGO_SAFE = 1450;
+const int LIFT_MAX = 2900;
 
-//These constants govern the thresholds of the air actuation lights
-const int MAX_ACTUATIONS = 48;
-const int MID_ACTUATIONS = 24;
-const int LOW_ACTUATIONS = 10;
+const int MOGO_MAX = 3450;
+const int MOGO_MID = 2000;
+const int MOGO_MIN = 1260;
+
+const int VBAR_MAX = 1000;
+const int VBAR_MIN = 0;
